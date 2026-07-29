@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>almer@blog: ~</title>
+<meta name="theme-color" content="#0B0C10">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B0C10;
+  --win:#101219;
+  --bar:#14161E;
+  --rule:#242736;
+  --text:#D7D5CE;
+  --dim:#8A8C99;
+  --faint:#5B5D6B;
+  --violet:#BB9AF7;
+  --green:#93C48D;
+  --cyan:#7FB3B0;
+  --warn:#E3A93F;
+  --red:#F0666A;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --pad:clamp(16px,4vw,40px);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:var(--mono);font-size:15px;line-height:1.7;
+  min-height:100vh;display:flex;flex-direction:column;
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:999;pointer-events:none;
+  background:repeating-linear-gradient(to bottom,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);
+}
+a{color:var(--violet)}
+::selection{background:var(--violet);color:var(--bg)}
+:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+
+/* ============ title bar ============ */
+.titlebar{
+  position:sticky;top:0;z-index:60;
+  background:var(--bar);border-bottom:1px solid var(--rule);
+  display:flex;align-items:center;gap:14px;
+  padding:0 var(--pad);height:52px;
+}
+.dots{display:flex;gap:7px;flex:none}
+.dots i{width:11px;height:11px;border-radius:50%;background:var(--rule);display:block}
+.dots i:first-child{background:#33294F}
+.tpath{
+  flex:1;text-align:center;font-size:13px;color:var(--dim);
+  background:none;border:0;font-family:var(--mono);cursor:pointer;padding:6px 4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.tpath b{color:var(--green);font-weight:500}
+.tpath:hover{color:var(--text)}
+.tpath span{color:var(--cyan)}
+.helpbtn{
+  flex:none;background:none;border:1px solid var(--rule);color:var(--violet);
+  font-family:var(--mono);font-size:12px;padding:6px 12px;cursor:pointer;
+  transition:.16s ease;white-space:nowrap;
+}
+.helpbtn:hover{background:var(--violet);color:var(--bg);border-color:var(--violet)}
+
+/* ============ output ============ */
+main{flex:1;padding:26px var(--pad) 40px;max-width:960px;width:100%;margin:0 auto}
+.block{margin-bottom:30px;scroll-margin-top:66px}
+.cmdline{color:var(--dim);font-size:14px;margin:0 0 14px;word-break:break-word}
+.cmdline b{color:var(--green);font-weight:500}
+.cmdline span{color:var(--cyan)}
+.cmdline em{color:var(--text);font-style:normal}
+
+.note{color:var(--dim);font-size:13.5px;margin:0 0 16px;padding-left:14px;border-left:1px solid var(--rule)}
+.err{color:var(--warn)}
+.ok{color:var(--green)}
+
+/* welcome */
+.banner{
+  color:var(--violet);font-size:clamp(6px,1.62vw,13px);line-height:1.3;
+  white-space:pre;overflow-x:auto;margin:0 0 20px;font-weight:500;
+}
+.lede{max-width:70ch;margin:0 0 18px}
+.lede b{color:var(--violet);font-weight:500}
+
+/* ============ listings ============ */
+.rows{border-top:1px solid var(--rule);margin:0 0 6px}
+.row{
+  display:grid;grid-template-columns:104px 82px 1fr 68px;gap:16px;align-items:baseline;
+  width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);
+  color:var(--text);font-family:var(--mono);font-size:14px;
+  padding:13px 10px 13px 4px;cursor:pointer;transition:background .15s ease,padding .15s ease;
+}
+.row:hover,.row:focus-visible{background:var(--win);padding-left:12px}
+.row .d{color:var(--faint);font-size:12.5px;white-space:nowrap}
+.row .k{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;border:1px solid currentColor;padding:2px 6px;justify-self:start;white-space:nowrap}
+.k.writeup{color:var(--violet)} .k.project{color:var(--cyan)} .k.cert{color:var(--green)} .k.note{color:var(--cyan)}
+.row .n{font-size:15px;line-height:1.4}
+.row:hover .n{color:var(--violet)}
+.row .r{color:var(--faint);font-size:12.5px;text-align:right;white-space:nowrap}
+.row .x{grid-column:3/5;color:var(--dim);font-size:13px;line-height:1.55;margin:5px 0 0;max-width:64ch}
+
+/* ============ prose (cat output) ============ */
+.doc{max-width:76ch;font-size:15px;line-height:1.85}
+.doc.wide{max-width:none}
+.doc figure{margin:0 0 26px}
+.job{margin:0 0 22px;padding-left:16px;border-left:1px solid var(--rule)}
+.job-h{color:var(--text);font-size:14.5px}
+.job-d{color:var(--faint);font-size:12.5px;margin:4px 0 8px}
+.job p{margin:0;color:var(--dim);font-size:14.5px}
+.doc img{display:block;width:100%;height:auto;border:1px solid var(--rule);background:var(--win)}
+.doc figcaption{color:var(--faint);font-size:12.5px;margin-top:9px;line-height:1.5}
+.doc a{color:var(--violet)}
+.doc h3{scroll-margin-top:72px}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin:0 0 6px}
+.lcell{background:var(--bg);border:0;color:var(--violet);font-family:var(--mono);font-size:13.5px;text-align:left;padding:11px 13px;cursor:pointer;transition:background .15s ease,color .15s ease}
+.lcell:hover,.lcell:focus-visible{background:var(--win);color:var(--text)}
+.pn{display:flex;gap:10px;flex-wrap:wrap;margin:32px 0 0;padding-top:22px;border-top:1px solid var(--rule)}
+.lvlnav{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 32px;padding:0 0 26px;border-bottom:1px solid var(--rule)}
+.lvlnav button{background:none;border:1px solid var(--rule);color:var(--dim);font-family:var(--mono);font-size:12px;padding:5px 10px;cursor:pointer;transition:.15s ease}
+.lvlnav button:hover{color:var(--violet);border-color:var(--violet)}
+.embed{border:1px solid var(--rule);background:#fff;margin:0 0 22px;line-height:0}
+.embed iframe{display:block;width:100%;height:600px;border:0}
+.doc p{margin:0 0 20px}
+.doc h3{
+  font-size:15px;font-weight:600;color:var(--violet);margin:34px 0 12px;letter-spacing:.01em;
+}
+.doc h3::before{content:"## ";color:var(--faint);font-weight:400}
+.doc ul{list-style:none;margin:0 0 20px;padding:0}
+.doc li{margin-bottom:7px;padding-left:22px;position:relative}
+.doc li::before{content:"-";position:absolute;left:6px;color:var(--violet)}
+.doc blockquote{
+  margin:0 0 22px;padding:2px 0 2px 18px;border-left:2px solid var(--violet);
+  color:var(--dim);font-style:italic;
+}
+.doc pre{
+  background:var(--win);border:1px solid var(--rule);border-left:2px solid var(--green);
+  padding:16px 18px;overflow-x:auto;margin:0 0 22px;font-size:13px;line-height:1.65;color:#C8C5B9;
+}
+.doc code{color:var(--violet)}
+.doc pre code{color:inherit}
+.doc b{color:var(--text);font-weight:600}
+
+.meta{
+  display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--faint);font-size:12.5px;
+  padding:0 0 18px;margin:0 0 26px;border-bottom:1px solid var(--rule);
+}
+
+/* ============ tables (help, certs) ============ */
+.tbl{width:100%;border-collapse:collapse;margin:0 0 8px;font-size:14px}
+.tbl td{padding:9px 14px 9px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+.tbl td:first-child{white-space:nowrap;width:1%}
+.cmdchip{
+  background:none;border:1px solid var(--rule);color:var(--violet);
+  font-family:var(--mono);font-size:13px;padding:4px 10px;cursor:pointer;transition:.15s ease;
+}
+.cmdchip:hover{background:var(--violet);color:var(--bg);border-color:var(--violet)}
+.tbl .desc{color:var(--dim)}
+.st{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;border:1px solid currentColor;padding:2px 7px;white-space:nowrap}
+.st.held{color:var(--green)} .st.wip{color:var(--warn)} .st.queued{color:var(--faint)}
+
+/* ============ prompt dock ============ */
+.dock{
+  position:sticky;bottom:0;z-index:60;
+  background:var(--bar);border-top:1px solid var(--rule);
+  padding:0 var(--pad) env(safe-area-inset-bottom);
+}
+.dock-inner{max-width:960px;margin:0 auto}
+.railwrap{display:flex;align-items:center;gap:12px;padding:11px 0 0}
+.raillabel{font-size:11px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;flex:none}
+.rail{display:flex;gap:8px;overflow-x:auto;padding-bottom:3px;scrollbar-width:thin}
+.rail::-webkit-scrollbar{height:3px}
+.rail::-webkit-scrollbar-thumb{background:var(--rule)}
+.pill{
+  flex:none;background:none;border:1px solid var(--rule);color:var(--text);
+  font-family:var(--mono);text-align:left;padding:7px 12px;cursor:pointer;transition:.15s ease;
+}
+.pill:hover{border-color:var(--violet);background:var(--win)}
+.pill b{display:block;font-size:12.5px;font-weight:500;color:var(--violet)}
+.pill span{display:block;font-size:11px;color:var(--dim);margin-top:1px;white-space:nowrap}
+
+.inputrow{display:flex;align-items:center;gap:10px;padding:12px 0 13px;position:relative}
+.ps1{font-size:14px;color:var(--green);white-space:nowrap;flex:none}
+.ps1 span{color:var(--cyan)}
+.ps1 i{color:var(--dim);font-style:normal}
+#cmd{
+  flex:1;background:none;border:0;outline:0;color:var(--text);
+  font-family:var(--mono);font-size:14px;padding:2px 0;min-width:0;
+}
+#cmd::placeholder{color:var(--faint)}
+.cursor{width:8px;height:16px;background:var(--violet);flex:none;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+.ac{
+  position:absolute;bottom:calc(100% + 8px);left:0;right:0;
+  background:var(--win);border:1px solid var(--rule);max-height:230px;overflow-y:auto;
+}
+.ac:empty{display:none}
+.ac button{
+  display:flex;gap:14px;align-items:baseline;width:100%;text-align:left;
+  background:none;border:0;border-bottom:1px solid var(--rule);color:var(--text);
+  font-family:var(--mono);font-size:13px;padding:9px 13px;cursor:pointer;
+}
+.ac button:last-child{border-bottom:0}
+.ac button:hover,.ac button.sel{background:var(--bar)}
+.ac button b{color:var(--violet);font-weight:500;white-space:nowrap}
+.ac button span{color:var(--dim);font-size:12px}
+
+@media (max-width:700px){
+  body{font-size:14px}
+  .row{grid-template-columns:1fr auto;gap:6px 12px;padding-left:0}
+  .row:hover{padding-left:0}
+  .row .d{grid-row:1;grid-column:1}
+  .row .r{grid-row:1;grid-column:2}
+  .row .k{grid-row:2;grid-column:1/3}
+  .row .n{grid-row:3;grid-column:1/3}
+  .row .x{grid-row:4;grid-column:1/3}
+  .raillabel{display:none}
+  .tpath{text-align:left}
+  .doc{font-size:14.5px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+  <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+  <button class="tpath" id="tpath" aria-label="Back to home"><b>almer@blog</b>: <span>~</span></button>
+  <button class="helpbtn" id="helpbtn">? New here</button>
+</div>
+
+<main id="out" aria-live="polite" aria-label="Terminal output"></main>
+
+<div class="dock">
+  <div class="dock-inner">
+    <div class="railwrap">
+      <span class="raillabel">Try</span>
+      <div class="rail" id="rail"></div>
+    </div>
+    <div class="inputrow">
+      <span class="ps1"><b style="color:var(--green)">almer@blog</b>:<span>~</span><i>$</i></span>
+      <label for="cmd" class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Type a command, or click a button above</label>
+      <input id="cmd" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="click a button above — or type 'help' and press Enter">
+      <span class="cursor" aria-hidden="true"></span>
+      <div class="ac" id="ac" role="listbox"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ------------------------------------------------------------------ data */
+const BANDIT = [
+  {id:"0", label:"Bandit 0", cmd:"ssh bandit0@bandit.lab.overthewire.org -p 2220", body:`<pre><code>ssh bandit0@bandit.lab.overthewire.org -p 2220
+Password: bandit0</code></pre>
+<p>SSH is the secure shell</p>
+<p>-p 2220 is the port that this lab is going to open on</p>
+<p>This is the host</p>`},
+  {id:"0-1", label:"Bandit 0-1", cmd:"ls", body:`<pre><code>ls</code></pre>
+<p>ls shows the list of files in the directory</p>
+<pre><code>readme</code></pre>
+<p>After doing ls, it shows readme as one of the files</p>
+<pre><code>cat readme</code></pre>
+<p>cat allows you to read what’s inside the file</p>
+<p>then the password: <code>ZjLjTmM6FvvyRnrb2rfNWOZOTa6ip5If</code></p>`},
+  {id:"1-2", label:"Bandit 1-2", cmd:"ls", body:`<pre><code>ls</code></pre>
+<p>After doing ls, a file shows as “-”</p>
+<pre><code>- 
+cat ./-</code></pre>
+<p>Again, we use cat to open up the file</p>
+<p>Then the password is given: <code>263JGJPfgU6LtdEvgfWU1XP5yac29mFx</code></p>`},
+  {id:"2-3", label:"Bandit 2-3", cmd:"ls", body:`<pre><code>ls
+--spaces in this filename--</code></pre>
+<p>We use ls to show the files</p>
+<p>file shows as “—spaces in this filename—’</p>
+<pre><code>cat ./&#x27;--spaces in this filename--&#x27;</code></pre>
+<p>Again, we use cat to open up the file, but this time we have to use quotation marks because of the filename, and if we don’t use quotation marks, it will think it’s different strings and cause an error</p>
+<p>The password is: <code>MNk8KNH3Usiio41PRUEoDFPqfxLPlSmx</code></p>`},
+  {id:"3-4", label:"Bandit 3-4", cmd:"ls", body:`<pre><code>ls 
+inhere</code></pre>
+<p>I used ls, and this time we got a directory instead of a file called “inhere.”</p>
+<pre><code>cd inhere
+ls inhere</code></pre>
+<p>cd is change directory, so we wanted to get into the inhere directory</p>
+<p>After we got in, we ls the directory to see if there were any files</p>
+<p>But unfortunately, there were no files</p>
+<pre><code>ls -a 
+...Hiding-From-You
+cat ./&#x27;...Hiding-From-You&#x27;</code></pre>
+<p>So I used -a in the ls command because -a gives us the hidden files inside the directory</p>
+<p>After using ls -a, we got a hidden file called “...Hiding-From-You”</p>
+<p>Then I used cat to show what&#x27;s inside the file</p>
+<p>And I got the password: <code>2WmrDFRmJIq3IPxneAaMGhap0pFhF3NJ</code></p>
+<p><br/></p>`},
+  {id:"4-5", label:"Bandit 4-5", cmd:"ls", body:`<pre><code>ls
+inhere
+cd inhere
+ls
+-file00  -file01  -file02  -file03  -file04  -file05  -file06  -file07  -file08  -file09
+cat ./&#x27;-file07&#x27;</code></pre>
+<p>I used ls, and I got the “inhere” directory, and then I used “cd inhere” to change my directory to “inhere”</p>
+<p>Again, I used ls, then got a bunch of different files</p>
+<p>So I used cat for each file until I reached “-file07”, then got the password: <code>4oQYVPkxZOOEOO5pTW81FB8j8lxXGUQw</code></p>`},
+  {id:"5-6", label:"Bandit 5-6", cmd:"ls", body:`<pre><code>ls 
+inhere
+cd inhere
+ls 
+maybehere00  maybehere02  maybehere04  maybehere06  maybehere08  maybehere10  maybehere12  maybehere14  maybehere16  maybehere18
+maybehere01  maybehere03  maybehere05  maybehere07  maybehere09  maybehere11  maybehere13  maybehere15  maybehere17  maybehere19
+find -size 1033c
+./maybehere07/.file2
+cat ./maybehere07/.file2</code></pre>
+<p>ls to see files/directory</p>
+<p>cd to change directory to “inhere”</p>
+<p>ls to see files in “inhere”</p>
+<p>We got a bunch of different files, so we use find</p>
+<p>find is used to find something within a file, like size, users, groups, etc</p>
+<p>So we use find -size 1033c</p>
+<p>1033 is the byte size that we are looking for, and c is just for byte size</p>
+<p>It gives us the path to find the file with the correct size that we are looking for</p>
+<p>So we use cat to open the path and give us the password: <code>HWasnPhtq9AVKe0dmk45nxy20cvUa6EG</code></p>`},
+  {id:"6-7", label:"Bandit 6-7", cmd:"ls", body:`<pre><code>ls
+ls -a
+.  ..  .bash_logout  .bashrc  .profile
+cd ..
+ls
+bandit0   bandit19      bandit28      bandit4    behemoth5  drifter2     formulaone3  leviathan1  manpage4  maze7    narnia8  utumno8   vortex18  vortex5
+bandit1   bandit2       bandit28-git  bandit5    behemoth6  drifter3     formulaone5  leviathan2  manpage5  maze8    narnia9  vortex0   vortex19  vortex6
+bandit10  bandit20      bandit29      bandit6    behemoth7  drifter4     formulaone6  leviathan3  manpage6  maze9    ubuntu   vortex1   vortex2   vortex7
+bandit11  bandit21      bandit29-git  bandit7    behemoth8  drifter5     krypton1     leviathan4  manpage7  narnia0  utumno0  vortex10  vortex20  vortex8
+bandit12  bandit22      bandit3       bandit8    drifter0   drifter6     krypton2     leviathan5  maze0     narnia1  utumno1  vortex11  vortex21  vortex9
+bandit13  bandit23      bandit30      bandit9    drifter1   drifter7     krypton3     leviathan6  maze1     narnia2  utumno2  vortex12  vortex22
+bandit14  bandit24      bandit30-git  behemoth0  drifter10  drifter8     krypton4     leviathan7  maze2     narnia3  utumno3  vortex13  vortex23
+bandit15  bandit25      bandit31      behemoth1  drifter12  drifter9     krypton5     manpage0    maze3     narnia4  utumno4  vortex14  vortex24
+bandit16  bandit26      bandit31-git  behemoth2  drifter13  formulaone0  krypton6     manpage1    maze4     narnia5  utumno5  vortex15  vortex25
+bandit17  bandit27      bandit32      behemoth3  drifter14  formulaone1  krypton7     manpage2    maze5     narnia6  utumno6  vortex16  vortex3
+bandit18  bandit27-git  bandit33      behemoth4  drifter15  formulaone2  leviathan0   manpage3    maze6     narnia7  utumno7  vortex17  vortex4
+cd ../
+ls
+oth           boot     etc         krypton  lib64              lost+found  media   opt   run                 snap  tmp     var
+bin                dev      formulaone  lib      lib.usr-is-merged  manpage     mnt     proc  sbin                srv   usr     vortex
+bin.usr-is-merged  drifter  home        lib32    libx32             maze        narnia  root  sbin.usr-is-merged  sys   utumno
+find -type f -user bandit7 -group bandit6 -size 33c
+./var/lib/dpkg/info/bandit7.password
+cat ./var/lib/dpkg/info/bandit7.password</code></pre>
+<p>ls showed no files or directories, so I used ls -a and it showed “. .. .bash_logout .bashrc .profile” for hidden directories and files</p>
+<p>So cd “..” and the directory was home, so ls to check the files, and there were a bunch of files, but we were looking for the entire server</p>
+<p>So I have to cd ../ again to get to the root of the server, then I ls the directory, and I got a bunch of different directories</p>
+<p>But we were looking for a specific file that contains a user of bandit7, group bandit6, byte size 33</p>
+<p>-type f is looking for files only</p>
+<p>then we do find -type f -user bandit7 -group bandit6 -size 33c</p>
+<p>This gives us a bunch of files that have permissions denied, but one that gives us access</p>
+<p>which is ./var/lib/dpkg/info/bandit7.password all you do now is cat the file</p>
+<p>this gives us the password: <code>morbNTDkSW6jIlUc0ymOdMaLnOlFVAaj</code><br/><br/></p>`},
+  {id:"7-8", label:"Bandit 7-8", cmd:"ls", body:`<pre><code>ls 
+data.txt
+cat data.txt</code></pre>
+<p>I ls to see what files or directories there are. The only one that was given was “data.txt” and we’re supposed to look in that file either way</p>
+<p>After “ cat data.txt” it gives us a bunch of different usernames and passwords, but were specifically looking for “millionth”</p>
+<pre><code>grep data.txt -e millionth</code></pre>
+<p>grep is used when you&#x27;re looking for a pattern</p>
+<p>-e is patterns are matching</p>
+<p>after telling what file to look in and what word to look for</p>
+<p>It gave me the password: <code>dfwvzFQi4mU0wfNbFOe9RoWskMLg7eEc</code></p>`},
+  {id:"8-9", label:"Bandit 8-9", cmd:"ls", body:`<pre><code>ls 
+data.txt
+cat data.txt</code></pre>
+<p>So I ls to see what files or directories it would give me, and the only one that showed up was data.txt</p>
+<p>So I decided to see what’s inside the file, so I cat it, and it gave me a list of passwords, but we’re looking for passwords that occur once</p>
+<p>I learned about sorting; it’s where you have a list, and you want to sort it in order</p>
+<p>Piping is where you want to use multiple commands together, so you use “|” between the commands</p>
+<p>Redirection is where you could send output to a file using “&lt;” or you could add something to the file by “&lt;&lt;” and you could also get input from a file using “&gt;”</p>
+<pre><code>cat data.txt | grep 1 | sort</code></pre>
+<p>In this level, we want to sort and cat, and I used grep to find a pattern</p>
+<p>After this, the list looks so much cleaner, and I was able to go down the list and see which password was given once</p>
+<p>So the password was: <code>4CKMh1JI91bUIZZPXDqGanal4xvAg0JM</code></p>`},
+  {id:"9-10", label:"Bandit 9-10", cmd:"ls", body:`<pre><code>ls 
+data.txt
+cat data.txt</code></pre>
+<p>Ls the directory and we’ve got a file called data.txt</p>
+<p>In this file, there is a bunch of unreadable text, some “=”, and some human-readable text</p>
+<p>We’re looking for human-readable text with a bunch of “=”</p>
+<pre><code>Strings data.txt | grep =</code></pre>
+<p>In this level, I’ve learned about string</p>
+<p>String&#x27;s basic use is to look for human-readable text in a file</p>
+<p>So I’ve used strings to look for human-readable text in “data.txt” and I used piping with grep to look for patterns with “=”</p>
+<p>The password was given: <code>FGUW5ilLVJrxX9kMYMmlN4MgbpfMiqey</code></p>`},
+  {id:"10-11", label:"Bandit 10-11", cmd:"ls", body:`<pre><code>ls 
+data.txt
+cat data.txt
+VGhlIHBhc3N3b3JkIGlzIGR0UjE3M2ZaS2IwUlJzREZTR3NnMlJXbnBOVmozcVJyCg==</code></pre>
+<p>ls to see what files were available</p>
+<p>cat to see what’s inside the file, and you could see that we have encoded data</p>
+<pre><code>base64 -d data.txt</code></pre>
+<p>We learned about base64 in this level</p>
+<p>Base64 is where you can turn encoded data and decoded into text. Also, base64 is used for data to represent as characters or letters</p>
+<p>“-d” is used for decode, and in this command, I base64 encoded and decoded the file</p>
+<p>I was able to get the password: <code>dtR173fZKb0RRsDFSGsg2RWnpNVj3qRr</code></p>`},
+  {id:"11-12", label:"Bandit 11-12", cmd:"ls", body:`<pre><code>ls
+data.txt
+cat data.txt
+Gur cnffjbeq vf 7k16JArUVv5LxVuJfsSVdbbtaHGlw9D4</code></pre>
+<p>We ls the directory and saw we have a data.txt file, then we cat the file to see what&#x27;s inside the file, and we are given random letters and numbers</p>
+<p>We are supposed to rotate the positions of these random letters and numbers 13 times</p>
+<p>So we need to learn about ROT13</p>
+<p>ROT13 is the alphabetical order, but it&#x27;s rotated 13 times already, so the input and output would look something like this:</p>
+<p>input: ABCDEFGHIJKLM NOPQRSTUVWXYZ abcdefghijklm nopqrstuvwxyz</p>
+<p>output: NOPQRSTUVWXYZ ABCDEFGHIJKLM nopqrstuvwxyz abcdefghijklm</p>
+<p>Then the A lines up with the N, and the Z lines up with the M</p>
+<pre><code>cat data.txt | tr &#x27;A-Za-z&#x27; &#x27;N-ZA-Mn-za-m&#x27;
+The password is 7x16WNeHIi5YkIhWsfFIqoognUTyj9Q4</code></pre>
+<p>So we’ve used piping where we combined two commands using “|”</p>
+<p>tr is a way to translate or squeeze, or delete characters in the input and write in the output</p>
+<p>So the ‘A-Za-z’ is just saying all the uppercase and lowercase letters, and ‘N-ZA-Mn-za-m’ is because N-Z is the second rotation of letters when it&#x27;s rotated by 13 times, and A-M is the first rotation of letters when it&#x27;s rotated</p>
+<p>After that, we are given the password: <code>7x16WNeHIi5YkIhWsfFIqoognUTyj9Q4</code></p>`},
+  {id:"12-13", label:"Bandit 12-13", cmd:"cat data.txt", body:`<pre><code>cat data.txt
+00000000: 1f8b 0808 2817 ee68 0203 6461 7461 322e  ....(..h..data2.
+00000010: 6269 6e00 013c 02c3 fd42 5a68 3931 4159  bin..&lt;...BZh91AY
+00000020: 2653 59cc 46b5 2d00 0018 ffff da5f e6e3  &amp;SY.F.-......_..
+00000030: 9fcd f59d bc69 ddd7 f7ff a7e7 dbdd b59f  .....i..........
+00000040: fff7 cfdd ffbf bbdf ffff ff5e b001 3b58  ...........^..;X
+00000050: 2406 8000 00d0 6834 6234 d000 6869 9000  $.....h4b4..hi..
+00000060: 1a7a 8003 40d0 01a1 a006 8188 340d 1a68  .z..@.......4..h
+00000070: d340 d189 e906 8f41 0346 4d94 40d1 91a0  .@.....A.FM.@...
+00000080: 681a 0681 a068 0680 c400 3207 a269 a189  h....h....2..i..
+00000090: a326 8000 c800 c81a 1883 1000 00d0 c023  .&amp;.............#
+000000a0: 4311 a034 30ca 6800 0680 0681 a680 6868  C..40.h.......hh
+000000b0: d068 6868 c04c d400 0003 4d06 87a8 d000  .hhh.L....M.....
+000000c0: 3086 8c20 3268 068d 000c 9a64 0698 8d04  0.. 2h.....d....
+000000d0: 0600 6860 3541 2c85 c8e1 7bc9 479e e369  ..h\`5A,...{.G..i
+000000e0: 30a1 0250 82e9 64ef 9d40 312f 4bc8 b00f  0..P..d..@1/K...
+000000f0: 0c8f 026c d5ca 1008 d7aa 336a ed8f bb7b  ...l......3j...{
+00000100: b43f d544 1658 824e a4af 9ce5 612e 8a27  .?.D.X.N....a..&#x27;
+00000110: c303 0512 cbff dccd f42d 6866 ceec 8127  .........-hf...&#x27;
+00000120: 5475 ed39 100b f897 7828 46e2 fdf3 efa7  Tu.9....x(F.....
+00000130: 43b0 1701 a114 397a 1d81 8d1f 1f23 2ada  C.....9z.....#*.
+00000140: 9b18 ee4d d05d 4ae3 d032 e494 ae98 27b0  ...M.]J..2....&#x27;.
+00000150: 30a0 533c 6696 60ad c546 70c4 322b 7174  0.S&lt;f.\`..Fp.2+qt
+00000160: 8bb1 52c6 ed0a 267b 7165 208b 77fe 1294  ..R...&amp;{qe .w...
+00000170: 2280 3311 354f c68e e004 93e3 abf4 5a0a  &quot;.3.5O........Z.
+00000180: a568 c894 27c2 9015 49bb 0147 c253 8e73  .h..&#x27;...I..G.S.s
+00000190: 2fdd 90e1 6871 c692 1d67 5ebc a5f9 b8a1  /...hq...g^.....
+000001a0: 3913 f073 1919 b628 9ae2 c1bf 15ee 493a  9..s...(......I:
+000001b0: e375 4d23 71e0 4934 c7a2 15ff 985c a0ba  .uM#q.I4.....\\..
+000001c0: 9e65 d613 313d 7cef 512a 32bf 835e 50d6  .e..1=|.Q*2..^P.
+000001d0: a54f 57ba bceb 6944 03c8 8a50 3542 9140  .OW...iD...P5B.@
+000001e0: eb51 0f4c 8a23 9401 0246 0457 d1c0 c33e  .Q.L.#...F.W...&gt;
+000001f0: c328 2de7 3d1d 64be 4190 36b0 b803 4f80  .(-.=.d.A.6...O.
+00000200: 40bc 3960 ac5e 13a9 3a77 0162 d662 7659  @.9\`.^..:w.b.bvY
+00000210: fdfd 9535 1188 8588 e8e5 a78d 9b24 c066  ...5.........$.f
+00000220: 91c6 4212 fac6 4ed8 ce48 161f cc44 215f  ..B...N..H...D!_
+00000230: 330c 5ed7 2709 e578 6efd 3775 c703 8aa1  3.^.&#x27;..xn.7u....
+00000240: 10b6 2c5d 16bf f352 c7ff c5dc 914e 1424  ..,]...R.....N.$
+00000250: 3311 ad4b 40d0 18b2 373c 0200 00         3..K@...7&lt;...</code></pre>
+<p>Once I cat the file, it showed a bunch of numbers and letters as a hex dump. A hex dump is the raw data within a file or computer memory.</p>
+<p>The way to solve a hex dump is by reverse engineering, digital forensics, and debugging.</p>
+<pre><code> xxd -r data.txt
+␦h�@щ��AFM�@ё�h␦��h��2�i���&amp;���␦���#C�40�h����hh�hhh�L�M���0�� 2h��h4b4�hi�␦z�@�����4
+                                                                  �d��h\`5A,���{�G��i0�P��d�@1/KȰ
+                                                                                                �l�ת3j폻{�?�DX�N����a.�&#x27;������-hf��&#x27;Tu�9
+                ��x(F����C��9z��#*ڛ�M�]J��2䔮�&#x27;�0�S&lt;f�\`��Fp�2+qt��R��
+&amp;{qe �w��&quot;�35OƎ����Z
+�hȔ&#x27;I�G�S�s/ݐ�hqƒg^�����9�s�(�����I:�uM#q�I4Ǣ��\\���e�1=|�Q*2��^P֥OW���iDȊP5B�@�QL�#�FW���&gt;�(-�=d�A�6��O�@�9\`�^�:wb�bvY���5����姍�$�f��B��N��H�D!_3
+                         ^�&#x27;    �xn�7u����,]��R���ܑN$3�K@��7/tmp/tmp.ovZkDjWE84cd /tmp/tmp.ovZkDjWE84</code></pre>
+<p>After I cat the file, I decided to xxd the file. The xxd command is used to make a hex dump or to reverse one. Also, -r is for the reverse operation. I tried to reverse the file, and I got nothing.</p>
+<pre><code>mktemp -d 
+/tmp/tmp.ovZkDjWE84
+ cp data.txt /tmp/tmp.ovZkDjWE84
+ cd /tmp/tmp.ovZkDjWE84</code></pre>
+<p>In this level, they had already created a directory for us to move the file into. That’s why we used mktemp -d. This gave us the pathway to the directory. After finding that out, I cp (copy files or directories) the data.txt file to the new directory. Eventually, I cd into the new directory.</p>
+<pre><code>xxd -r data.txt &gt; data
+ls
+data  data.txt
+file data
+data: gzip compressed data, was &quot;data2.bin&quot;, last modified: Tue Oct 14 09:26:00 2025, max compression, from Unix, original size modulo 2^32 572
+mv data data1.gz
+gzip -d data1.gz
+ls
+data1  data.txt</code></pre>
+<p>I tried to reverse the file input by redirecting it into another file called data. I file data to see what type of file it was and notice it was a gzip compressed data. Gzip is a compression tool. So I moved the data information into data1.gz, which is needed for when we need to decompress, so having that .gz or .bz2 will allow us to decompress the file. I decided to decompress the gzip file, which is done by gzip -d data1.gz.</p>
+<p>I noticed when I ls the directory, there are two files: data1, which is where we just decompressed, and data.txt</p>
+<pre><code>file data1
+data1: bzip2 compressed data, block size = 900k
+mv data1 data1.bz2
+bzip2 -d data1.bz2
+ls
+data1  data.txt</code></pre>
+<p>I wanted to see what type of file data1 was, and this time it was bzip2. Bzip2 is just another compression tool like gzip. So we have to move the file into data1.bz2 since now it’s a bzip2 compressed data file. After this, we have to repeat the process and decompress it with bzip2 -d data1.bz2. Then I ls the directory and found that data1 is still there.</p>
+<pre><code>file data1
+data1: gzip compressed data, was &quot;data4.bin&quot;, last modified: Tue Oct 14 09:26:00 2025, max compression, from Unix, original size modulo 2^32 20480
+mv data1 data1.gz
+gzip -d data1.gz
+file data1
+data1: POSIX tar archive (GNU)</code></pre>
+<p>I file data1 and noticed it was gzip again, so I moved the file into data1.gz, then decided to decompress the file. Then again, I file the data1 to see what type of file it was. But this time it was something different called tar. Tar can hold multiple things in one.</p>
+<pre><code>mv data1 data.tar
+tar xf data.tar
+ls
+data5.bin  data.tar  data.txt</code></pre>
+<p>So I moved data1 into data.tar, then I tar xf (gets the file) then I ls the directory, and now there are multiple files.</p>
+<pre><code>file data.tar
+data.tar: POSIX tar archive (GNU)
+file data5.bin
+data5.bin: POSIX tar archive (GNU)
+mv data5.bin data.tar
+tar xf data.tar
+file data.tar
+data.tar: POSIX tar archive (GNU)
+ls
+data6.bin  data.tar data.txt</code></pre>
+<p>Again, I file data5.bin since that was new to the directory, and then I got tar. Then I went on to move the data5.bin to data.tar, then I tar xf <a href="http://data.tr" target="_blank" rel="noopener">data.tr</a> to once again file it, but I got the same thing tar. I ls the directory but noticed that data6.bin was new to the directory.</p>
+<pre><code>file data6.bin
+data6.bin: bzip2 compressed data, block size = 900k
+mv data6.bin data.bz2
+bzip2 -d data.bz2
+ls
+data  data.tar
+file data
+data: POSIX tar archive (GNU)
+mv data data.tar
+ls
+data.tar
+tar xf data.tar
+ls
+data8.bin  data.tar
+file data8.bin
+data8.bin: gzip compressed data, was &quot;data9.bin&quot;, last modified: Tue Oct 14 09:26:00 2025, max compression, from Unix, original size modulo 2^32 49mv data8.bin data.gz</code></pre>
+<p>You would want to file the data6.bin and notice again, you have to bzip2 decompress the file and then check what files are there in the directory. Then file data and notice again it’s tar, so you have to move the data file into data.tar, then tar xf data.tar. But once you ls you get a file called data8.bin, so once you see the file type, that file is you gzip decompress it.</p>
+<pre><code>mv data8.bin data.gz
+ls
+data.gz  data.tar
+gzip -d data.gz
+ls
+data  data.tar
+file data
+data: ASCII text
+cat data</code></pre>
+<p>We go through the gzip decompression one more time, and at the end of the decompression. Once we ls the directory, we see a data file, and I file the data file and saw it’s an ASCII text, and that’s what we are looking for, and that basically confirms that we’ve reached the end of the hex dump. So we cat the file and get the password: <code>FO5dwFsc0cbaIiH0h8J2eUks2vdTDwAn</code></p>`},
+  {id:"13-14", label:"Bandit 13-14", cmd:"ls", body:`<pre><code>ls 
+sshkey.private
+cat sshkey.private
+[RSA private key omitted — you get your own copy when you run this level]
+exit</code></pre>
+<p>First off, I ls the directory, and then I cat the file to see what was inside of it. What was inside was the string for the sshkey.private. I tried ssh into bandit14, but I kept getting my permissions denied.</p>
+<p>How I kept getting denied was by doing this;</p>
+<pre><code>ssh bandit14@bandit.labs.overthewire.org -p 2220 -i sshkey.private
+!!! You are trying to log into this SSH server with a password on port 2220 from localhost.
+!!! Connecting from localhost is blocked to conserve resources.
+!!! Please log out and log in again.</code></pre>
+<p>So this was completely wrong</p>
+<pre><code>almer@LAPTOP-OHBL0RFG:~$ echo &#x27;[RSA private key omitted — you get your own copy when you run this level]&#x27; &gt; private.key</code></pre>
+<p>When I exited from bandit13@bandit and went into almer@LAPTOP-OHBL0RFG, I echoed the sshkey.private key and redirected it into a new file on my host.</p>
+<pre><code>almer@LAPTOP-OHBL0RFG:~$ ls 
+private.key</code></pre>
+<p>After this, I tried ssh into bandit14 as I did before, and it still didn’t work and kept getting denied</p>
+<p>So I looked into the file permissions and saw it was -rw-r--r--, which r means read and w means write. With these permissions, I wasn’t able to execute as the owner.</p>
+<pre><code>almer@LAPTOP-OHBL0RFG:~$ chmod 700 private.key</code></pre>
+<p>chmod allows us to change the permissions of the file (private.key). 700 means to change a certain section&#x27;s permission. The 7 means the owner section, and it also means to allow them to read, write, and execute. Neither of the 0’s doesn’t allow group and others to read, write, and execute.</p>
+<pre><code>almer@LAPTOP-OHBL0RFG:~$ ssh bandit14@bandit.labs.overthewire.org -p 2220 -i private.key</code></pre>
+<p>since I was able to change the permissions of the file. I decided to ssh bandit14 another time. -i means identifying which private key file to use when trying to connect to a host or server. But after I typed this command, I was able to get into bandit14 labs without a password.</p>`},
+  {id:"14-15", label:"Bandit 14-15", cmd:"ls", body:`<pre><code>ls
+man nc
+ip addr
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+2: ens5: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 9001 qdisc mq state UP group default qlen 1000
+    link/ether 06:59:b7:63:08:69 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.1.98/24 metric 100 brd 10.0.1.255 scope global dynamic ens5
+       valid_lft 1072sec preferred_lft 1072sec
+    inet6 fe80::459:b7ff:fe63:869/64 scope link
+       valid_lft forever preferred_lft forever</code></pre>
+<p>When I typed in ls there was no file or directory. So I decided to learn what nc (netcat) does, and in this level we have to use it to connect to the server with the port of 30000 on the local host. Then I tried finding the IP address by using ip addr and saw it was 127.0.0.1</p>
+<pre><code>nc -v 127.0.0.1 30000
+Connection to 127.0.0.1 30000 port [tcp/*] succeeded!
+
+Wrong! Please enter the correct current password.</code></pre>
+<p>I tried connecting to the server with the port, as you can see, we used nc. But -v means verbose, and it basically means to speed up the process. But with this, I was able to connect to the server and the port, but I didn’t have the password</p>
+<pre><code>find -name &quot;bandit&quot;</code></pre>
+<p>So I tried to find any file or directory with the name that has bandit in it. I wasn’t able to get anything from it</p>
+<pre><code> cd ../../
+ find -name &quot;bandit&quot;
+ find -name &quot;bandit14&quot;
+ ./etc/bandit_pass/bandit14</code></pre>
+<p>After not getting anything from it. I decided to go to the root and try to find a file or directory with the name bandit in it. But I was denied from everything, so I tried to go more specific by searching for bandit14. Then I was able see the pathway of a certain file.</p>
+<pre><code>cat ./etc/bandit_pass/bandit14
+MU4VWeTyJk8ROof1qqmcBPaLh7lDCPvS
+cd ~
+nc -v 127.0.0.1 30000
+Connection to 127.0.0.1 30000 port [tcp/*] succeeded!
+MU4VWeTyJk8ROof1qqmcBPaLh7lDCPvS
+Correct!
+8xCjnmgoKbGLhHFAZlGE5Tmu4M2tKJQo</code></pre>
+<p>Since I was able to see the pathway of the file I have access to. I decided to see what’s inside it, and I got the password to the connection to the server earlier. Once I entered the password, I was able to connect to the server.</p>
+<p>The password that was given: <code>8xCjnmgoKbGLhHFAZlGE5Tmu4M2tKJQo</code></p>`},
+  {id:"15-16", label:"Bandit 15-16", cmd:"openssl s_client -connect localhost:30001", body:`<pre><code>openssl s_client -connect localhost:30001</code></pre>
+<p>OpenSSL is a command-line program that implements SSL (Secure Socket Layer) and TLS (Transport Layer Security), and uses cryptography</p>
+<p>s_client is used to connect to a server remotely, which uses SSL and TLS</p>
+<p>-connect is used to connect to the host and port</p>
+<p><a href="http://localhost:30001" target="_blank" rel="noopener">localhost:30001</a>, and it’s in this format because it’s a TCP connection</p>
+<p>After typing that in, we got this as the output.</p>
+<pre><code>CONNECTED(00000003)
+Can&#x27;t use SSL_get_servername
+depth=0 CN = SnakeOil
+verify error:num=18:self-signed certificate
+verify return:1
+depth=0 CN = SnakeOil
+verify return:1
+---
+Certificate chain
+ 0 s:CN = SnakeOil
+   i:CN = SnakeOil
+   a:PKEY: rsaEncryption, 4096 (bit); sigalg: RSA-SHA256
+   v:NotBefore: Jun 10 03:59:50 2024 GMT; NotAfter: Jun  8 03:59:50 2034 GMT
+---
+Server certificate
+-----BEGIN CERTIFICATE-----
+MIIFBzCCAu+gAwIBAgIUBLz7DBxA0IfojaL/WaJzE6Sbz7cwDQYJKoZIhvcNAQEL
+BQAwEzERMA8GA1UEAwwIU25ha2VPaWwwHhcNMjQwNjEwMDM1OTUwWhcNMzQwNjA4
+MDM1OTUwWjATMREwDwYDVQQDDAhTbmFrZU9pbDCCAiIwDQYJKoZIhvcNAQEBBQAD
+ggIPADCCAgoCggIBANI+P5QXm9Bj21FIPsQqbqZRb5XmSZZJYaam7EIJ16Fxedf+
+jXAv4d/FVqiEM4BuSNsNMeBMx2Gq0lAfN33h+RMTjRoMb8yBsZsC063MLfXCk4p+
+09gtGP7BS6Iy5XdmfY/fPHvA3JDEScdlDDmd6Lsbdwhv93Q8M6POVO9sv4HuS4t/
+jEjr+NhE+Bjr/wDbyg7GL71BP1WPZpQnRE4OzoSrt5+bZVLvODWUFwinB0fLaGRk
+GmI0r5EUOUd7HpYyoIQbiNlePGfPpHRKnmdXTTEZEoxeWWAaM1VhPGqfrB/Pnca+
+vAJX7iBOb3kHinmfVOScsG/YAUR94wSELeY+UlEWJaELVUntrJ5HeRDiTChiVQ++
+wnnjNbepaW6shopybUF3XXfhIb4NvwLWpvoKFXVtcVjlOujF0snVvpE+MRT0wacy
+tHtjZs7Ao7GYxDz6H8AdBLKJW67uQon37a4MI260ADFMS+2vEAbNSFP+f6ii5mrB
+18cY64ZaF6oU8bjGK7BArDx56bRc3WFyuBIGWAFHEuB948BcshXY7baf5jjzPmgz
+mq1zdRthQB31MOM2ii6vuTkheAvKfFf+llH4M9SnES4NSF2hj9NnHga9V08wfhYc
+x0W6qu+S8HUdVF+V23yTvUNgz4Q+UoGs4sHSDEsIBFqNvInnpUmtNgcR2L5PAgMB
+AAGjUzBRMB0GA1UdDgQWBBTPo8kfze4P9EgxNuyk7+xDGFtAYzAfBgNVHSMEGDAW
+gBTPo8kfze4P9EgxNuyk7+xDGFtAYzAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3
+DQEBCwUAA4ICAQAKHomtmcGqyiLnhziLe97Mq2+Sul5QgYVwfx/KYOXxv2T8ZmcR
+Ae9XFhZT4jsAOUDK1OXx9aZgDGJHJLNEVTe9zWv1ONFfNxEBxQgP7hhmDBWdtj6d
+taqEW/Jp06X+08BtnYK9NZsvDg2YRcvOHConeMjwvEL7tQK0m+GVyQfLYg6jnrhx
+egH+abucTKxabFcWSE+Vk0uJYMqcbXvB4WNKz9vj4V5Hn7/DN4xIjFko+nREw6Oa
+/AUFjNnO/FPjap+d68H1LdzMH3PSs+yjGid+6Zx9FCnt9qZydW13Miqg3nDnODXw
++Z682mQFjVlGPCA5ZOQbyMKY4tNazG2n8qy2famQT3+jF8Lb6a4NGbnpeWnLMkIu
+jWLWIkA9MlbdNXuajiPNVyYIK9gdoBzbfaKwoOfSsLxEqlf8rio1GGcEV5Hlz5S2
+txwI0xdW9MWeGWoiLbZSbRJH4TIBFFtoBG0LoEJi0C+UPwS8CDngJB4TyrZqEld3
+rH87W+Et1t/Nepoc/Eoaux9PFp5VPXP+qwQGmhir/hv7OsgBhrkYuhkjxZ8+1uk7
+tUWC/XM0mpLoxsq6vVl3AJaJe1ivdA9xLytsuG4iv02Juc593HXYR8yOpow0Eq2T
+U5EyeuFg5RXYwAPi7ykw1PW7zAPL4MlonEVz+QXOSx6eyhimp1VZC11SCg==
+-----END CERTIFICATE-----
+subject=CN = SnakeOil
+issuer=CN = SnakeOil
+---
+No client certificate CA names sent
+Peer signing digest: SHA256
+Peer signature type: RSA-PSS
+Server Temp Key: X25519, 253 bits
+---
+SSL handshake has read 2103 bytes and written 373 bytes
+Verification error: self-signed certificate
+---
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Server public key is 4096 bit
+Secure Renegotiation IS NOT supported
+Compression: NONE
+Expansion: NONE
+No ALPN negotiated
+Early data was not sent
+Verify return code: 18 (self-signed certificate)
+---
+---
+Post-Handshake New Session Ticket arrived:
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : TLS_AES_256_GCM_SHA384
+    Session-ID: EDF50AE7D915CC866306E9E000A1E88D402DC2D65908C0BFBC6435E5E649D754
+    Session-ID-ctx:
+    Resumption PSK: 2286E7F39778ED06B3719AA781C61783FB26A4B506C9053CB715DCACCB3A441EAE04D15806DF8FA27BCCE5E67797E680
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    TLS session ticket lifetime hint: 300 (seconds)
+    TLS session ticket:
+    0000 - c1 5a 7b 5d e1 cb b9 1d-f9 d4 51 11 c6 30 6f 45   .Z{]......Q..0oE
+    0010 - b4 69 ee 92 10 60 ae 28-12 1e c0 5b c9 1e 9b de   .i...\`.(...[....
+    0020 - 8e 3b 01 2a dc 31 5e dc-21 9b 13 a3 3c 88 88 fb   .;.*.1^.!...&lt;...
+    0030 - 44 e8 52 43 b8 ee f0 ad-30 38 11 23 1b 9f f1 77   D.RC....08.#...w
+    0040 - 32 41 3b 1b 16 97 34 1f-69 48 2f 78 ee b2 cd 46   2A;...4.iH/x...F
+    0050 - 3f 93 92 cc 8f 4d 1a 86-d8 01 43 7e eb f0 45 27   ?....M....C~..E&#x27;
+    0060 - 0f 6b 91 77 d4 02 e5 aa-a4 38 32 f5 35 23 e7 96   .k.w.....82.5#..
+    0070 - f8 4a ba f9 e2 df 14 4c-83 af f8 ee 11 7f da 57   .J.....L.......W
+    0080 - 4e 5d f4 fe f0 2b 07 4b-bf 2e 23 99 ff 36 2d e6   N]...+.K..#..6-.
+    0090 - e3 50 35 9f b5 36 d1 6a-68 88 6f fc 25 fa 36 14   .P5..6.jh.o.%.6.
+    00a0 - 04 e1 08 3f 47 c7 f0 b5-76 89 00 d4 20 de 2b 61   ...?G...v... .+a
+    00b0 - b8 8c 0d 13 2c 84 ca 7f-b9 0a ad 56 4c e5 57 d7   ....,......VL.W.
+    00c0 - 0c 70 ce 64 62 aa ce b8-55 d5 24 cf ab 96 06 a5   .p.db...U.$.....
+    00d0 - ac 2d 07 8d 85 0f 2c 2a-33 ee da 6d f7 db ea 8e   .-....,*3..m....
+
+    Start Time: 1765927468
+    Timeout   : 7200 (sec)
+    Verify return code: 18 (self-signed certificate)
+    Extended master secret: no
+    Max Early Data: 0
+---
+read R BLOCK
+---
+Post-Handshake New Session Ticket arrived:
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : TLS_AES_256_GCM_SHA384
+    Session-ID: CE77E5ED35B999BC5E800D05539126FCB7C54ECD604A6D5808BFC3D63D474730
+    Session-ID-ctx:
+    Resumption PSK: 44AC0025F367A8AA403C6C308B82EDB9046E9476B066F25B59A2971496DA318DDE97388CD172F9035A6C07BF9E1AE91B
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    TLS session ticket lifetime hint: 300 (seconds)
+    TLS session ticket:
+    0000 - c1 5a 7b 5d e1 cb b9 1d-f9 d4 51 11 c6 30 6f 45   .Z{]......Q..0oE
+    0010 - 1e e0 5d ed ae 65 dd 05-a9 99 ec 53 29 e3 c3 0f   ..]..e.....S)...
+    0020 - f4 a6 a6 ed aa 7e 7a 8e-3e 42 f4 2f 41 01 ed b3   .....~z.&gt;B./A...
+    0030 - 05 02 f9 63 72 ee 71 89-ba 19 c1 f9 c4 4a 45 6a   ...cr.q......JEj
+    0040 - 0d 3a 27 a7 51 10 c8 84-cf 4d 32 21 f8 19 93 b8   .:&#x27;.Q....M2!....
+    0050 - 0e 39 1e 07 cd f7 3b a2-f0 88 c4 2e 68 c4 71 9b   .9....;.....h.q.
+    0060 - 1a b7 ba 99 82 40 d9 af-2c 28 f6 d5 f7 ba 5e d4   .....@..,(....^.
+    0070 - ae 98 ab 22 b7 c6 db 4e-ea dc 76 b6 dc 3b 8b 4c   ...&quot;...N..v..;.L
+    0080 - 7d 41 dc 42 a1 4e a0 23-79 c1 d7 9c 8c 5a 3f 0b   }A.B.N.#y....Z?.
+    0090 - 74 54 18 ba e3 71 0f ab-fc 39 5a 36 45 9a b4 ff   tT...q...9Z6E...
+    00a0 - f7 47 f3 32 4c 30 bf 49-79 4b b4 96 30 51 e5 fe   .G.2L0.IyK..0Q..
+    00b0 - ad c7 a7 10 25 b1 5d 97-1f 30 f6 98 8d 52 8e ae   ....%.]..0...R..
+    00c0 - b5 e1 29 8c 90 82 47 eb-e8 23 67 74 a4 21 26 08   ..)...G..#gt.!&amp;.
+    00d0 - ab b9 2c da 59 74 7e b7-e6 c2 1b 48 7d 90 20 02   ..,.Yt~....H}. .
+
+    Start Time: 1765927468
+    Timeout   : 7200 (sec)
+    Verify return code: 18 (self-signed certificate)
+    Extended master secret: no
+    Max Early Data: 0
+---
+read R BLOCK
+
+Wrong! Please enter the correct current password.
+closed</code></pre>
+<p>I tried pressing enter again, and I saw that we have to enter the current password of this level.</p>
+<pre><code>read R BLOCK
+8xCjnmgoKbGLhHFAZlGE5Tmu4M2tKJQo
+Correct!
+kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx
+
+closed</code></pre>
+<p>So after putting in the correct password, I was able to get the next level password, which is: <code>kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx</code></p>`},
+  {id:"16-17", label:"Bandit 16-17", cmd:"openssl s_client -connect localhost:31518 nmap -p 31", body:`<pre><code>openssl s_client -connect localhost:31518 nmap -p 31000-32000 localhost
+ Starting Nmap 7.94SVN ( https://nmap.org ) at 2025-12-17 00:51 UTC
+Nmap scan report for localhost (127.0.0.1)
+Host is up (0.00020s latency).
+Not shown: 996 closed tcp ports (conn-refused)
+PORT      STATE SERVICE
+31046/tcp open  unknown
+31518/tcp open  unknown
+31691/tcp open  unknown
+31790/tcp open  unknown
+31960/tcp open  unknown</code></pre>
+<p>I tried to see what ports were open from 31000-32000 by using nmap scan on the local host</p>
+<pre><code>openssl s_client -connect localhost:31518
+CONNECTED(00000003)
+Can&#x27;t use SSL_get_servername
+depth=0 CN = SnakeOil
+verify error:num=18:self-signed certificate
+verify return:1
+depth=0 CN = SnakeOil
+verify return:1
+---
+Certificate chain
+ 0 s:CN = SnakeOil
+   i:CN = SnakeOil
+   a:PKEY: rsaEncryption, 4096 (bit); sigalg: RSA-SHA256
+   v:NotBefore: Jun 10 03:59:50 2024 GMT; NotAfter: Jun  8 03:59:50 2034 GMT
+---
+Server certificate
+-----BEGIN CERTIFICATE-----
+MIIFBzCCAu+gAwIBAgIUBLz7DBxA0IfojaL/WaJzE6Sbz7cwDQYJKoZIhvcNAQEL
+BQAwEzERMA8GA1UEAwwIU25ha2VPaWwwHhcNMjQwNjEwMDM1OTUwWhcNMzQwNjA4
+MDM1OTUwWjATMREwDwYDVQQDDAhTbmFrZU9pbDCCAiIwDQYJKoZIhvcNAQEBBQAD
+ggIPADCCAgoCggIBANI+P5QXm9Bj21FIPsQqbqZRb5XmSZZJYaam7EIJ16Fxedf+
+jXAv4d/FVqiEM4BuSNsNMeBMx2Gq0lAfN33h+RMTjRoMb8yBsZsC063MLfXCk4p+
+09gtGP7BS6Iy5XdmfY/fPHvA3JDEScdlDDmd6Lsbdwhv93Q8M6POVO9sv4HuS4t/
+jEjr+NhE+Bjr/wDbyg7GL71BP1WPZpQnRE4OzoSrt5+bZVLvODWUFwinB0fLaGRk
+GmI0r5EUOUd7HpYyoIQbiNlePGfPpHRKnmdXTTEZEoxeWWAaM1VhPGqfrB/Pnca+
+vAJX7iBOb3kHinmfVOScsG/YAUR94wSELeY+UlEWJaELVUntrJ5HeRDiTChiVQ++
+wnnjNbepaW6shopybUF3XXfhIb4NvwLWpvoKFXVtcVjlOujF0snVvpE+MRT0wacy
+tHtjZs7Ao7GYxDz6H8AdBLKJW67uQon37a4MI260ADFMS+2vEAbNSFP+f6ii5mrB
+18cY64ZaF6oU8bjGK7BArDx56bRc3WFyuBIGWAFHEuB948BcshXY7baf5jjzPmgz
+mq1zdRthQB31MOM2ii6vuTkheAvKfFf+llH4M9SnES4NSF2hj9NnHga9V08wfhYc
+x0W6qu+S8HUdVF+V23yTvUNgz4Q+UoGs4sHSDEsIBFqNvInnpUmtNgcR2L5PAgMB
+AAGjUzBRMB0GA1UdDgQWBBTPo8kfze4P9EgxNuyk7+xDGFtAYzAfBgNVHSMEGDAW
+gBTPo8kfze4P9EgxNuyk7+xDGFtAYzAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3
+DQEBCwUAA4ICAQAKHomtmcGqyiLnhziLe97Mq2+Sul5QgYVwfx/KYOXxv2T8ZmcR
+Ae9XFhZT4jsAOUDK1OXx9aZgDGJHJLNEVTe9zWv1ONFfNxEBxQgP7hhmDBWdtj6d
+taqEW/Jp06X+08BtnYK9NZsvDg2YRcvOHConeMjwvEL7tQK0m+GVyQfLYg6jnrhx
+egH+abucTKxabFcWSE+Vk0uJYMqcbXvB4WNKz9vj4V5Hn7/DN4xIjFko+nREw6Oa
+/AUFjNnO/FPjap+d68H1LdzMH3PSs+yjGid+6Zx9FCnt9qZydW13Miqg3nDnODXw
++Z682mQFjVlGPCA5ZOQbyMKY4tNazG2n8qy2famQT3+jF8Lb6a4NGbnpeWnLMkIu
+jWLWIkA9MlbdNXuajiPNVyYIK9gdoBzbfaKwoOfSsLxEqlf8rio1GGcEV5Hlz5S2
+txwI0xdW9MWeGWoiLbZSbRJH4TIBFFtoBG0LoEJi0C+UPwS8CDngJB4TyrZqEld3
+rH87W+Et1t/Nepoc/Eoaux9PFp5VPXP+qwQGmhir/hv7OsgBhrkYuhkjxZ8+1uk7
+tUWC/XM0mpLoxsq6vVl3AJaJe1ivdA9xLytsuG4iv02Juc593HXYR8yOpow0Eq2T
+U5EyeuFg5RXYwAPi7ykw1PW7zAPL4MlonEVz+QXOSx6eyhimp1VZC11SCg==
+-----END CERTIFICATE-----
+subject=CN = SnakeOil
+issuer=CN = SnakeOil
+---
+No client certificate CA names sent
+Peer signing digest: SHA256
+Peer signature type: RSA-PSS
+Server Temp Key: X25519, 253 bits
+---
+SSL handshake has read 2103 bytes and written 373 bytes
+Verification error: self-signed certificate
+---
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Server public key is 4096 bit
+Secure Renegotiation IS NOT supported
+Compression: NONE
+Expansion: NONE
+No ALPN negotiated
+Early data was not sent
+Verify return code: 18 (self-signed certificate)
+---
+---
+Post-Handshake New Session Ticket arrived:
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : TLS_AES_256_GCM_SHA384
+    Session-ID: 4EFC7DD49C9E22253AC732FEB3394D5E4ACFAA83AAB29B3A0F3E4252050EE2B7
+    Session-ID-ctx:
+    Resumption PSK: 07862F07BA565AA25CE48E3840B6D918ABBCF4AAB751121CE6A8CEFD76FA5C27CDE5B20E3D8F39B705AAEBE127A65B5C
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    TLS session ticket lifetime hint: 300 (seconds)
+    TLS session ticket:
+    0000 - e0 38 01 62 91 f5 7a 9b-92 c2 b3 62 48 63 d9 2e   .8.b..z....bHc..
+    0010 - 49 bc 44 22 f9 14 6f 63-1c fd 04 9d 5f b1 d5 52   I.D&quot;..oc...._..R
+    0020 - 8b bc 75 a1 a2 11 9d 30-4a bc 34 e6 b6 19 7d ea   ..u....0J.4...}.
+    0030 - 05 a7 ff 29 4f 30 75 2c-da bc c2 2b 5f 2d dc d8   ...)O0u,...+_-..
+    0040 - 34 fe 29 08 b2 31 53 58-fc f8 3a 5f 67 73 f1 7a   4.)..1SX..:_gs.z
+    0050 - 78 9a 78 08 5e db 41 1a-e7 d0 bf b0 22 62 6f 76   x.x.^.A.....&quot;bov
+    0060 - 32 a8 35 42 9e 35 39 ea-f2 46 a7 da 3e 6b 5d 9a   2.5B.59..F..&gt;k].
+    0070 - ca c4 dd 72 f3 b8 d3 66-87 bb 4c eb 0c 01 cf a2   ...r...f..L.....
+    0080 - 2f 59 8c 43 04 06 58 78-63 1c 6d a1 f6 d8 c2 e0   /Y.C..Xxc.m.....
+    0090 - b6 fb 60 d5 4e 17 11 ca-a1 0c 61 63 46 a1 3f f8   ..\`.N.....acF.?.
+    00a0 - cc 26 30 71 56 c4 ef 13-ea 4e de 71 21 95 95 1b   .&amp;0qV....N.q!...
+    00b0 - fd e3 c6 88 80 20 75 f1-ad 54 04 53 6f ee 0c 13   ..... u..T.So...
+    00c0 - be 46 b5 bd b1 66 60 be-8c 9b 07 1f 33 d6 c5 ec   .F...f\`.....3...
+    00d0 - c1 f1 b3 a7 a1 ac c4 32-46 79 e1 f6 f1 04 1d 39   .......2Fy.....9
+
+    Start Time: 1765932835
+    Timeout   : 7200 (sec)
+    Verify return code: 18 (self-signed certificate)
+    Extended master secret: no
+    Max Early Data: 0
+---
+read R BLOCK
+---
+Post-Handshake New Session Ticket arrived:
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : TLS_AES_256_GCM_SHA384
+    Session-ID: 0BC7540DEAC9230925034C85018DE9AE79508F0214217038858BC820F4DCA455
+    Session-ID-ctx:
+    Resumption PSK: 05F0A756AEDB2AB8548D85CCCB45500A0E6F7283882D309F4D31C802747123C8B3E1668D93CE527FEBEC40F49F1FAD93
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    TLS session ticket lifetime hint: 300 (seconds)
+    TLS session ticket:
+    0000 - e0 38 01 62 91 f5 7a 9b-92 c2 b3 62 48 63 d9 2e   .8.b..z....bHc..
+    0010 - b1 a6 03 64 13 19 e2 22-4b f3 4b 09 bd 00 f7 fc   ...d...&quot;K.K.....
+    0020 - f0 09 ef 18 1d b4 d6 c1-d2 42 5a a6 02 d2 29 7b   .........BZ...){
+    0030 - 25 65 3b 55 7b 47 86 b7-83 a2 0b 74 0f 48 11 b5   %e;U{G.....t.H..
+    0040 - 84 32 ef df b3 04 7d 83-d3 50 7a 32 c9 9b 09 f9   .2....}..Pz2....
+    0050 - 9a 6e 7a 31 f4 69 c8 6d-12 45 a5 60 de 25 a8 c6   .nz1.i.m.E.\`.%..
+    0060 - ef 05 60 64 ab bc 10 59-17 42 7a 07 57 b3 68 99   ..\`d...Y.Bz.W.h.
+    0070 - b4 86 e8 f1 ba 3c 14 6f-24 53 0b 11 8c 50 ee f6   .....&lt;.o$S...P..
+    0080 - e0 59 97 b4 46 85 90 40-70 93 fa 44 49 a8 54 01   .Y..F..@p..DI.T.
+    0090 - 68 8b 24 73 e2 9c 14 e4-06 c7 60 d3 bf 63 29 e5   h.$s......\`..c).
+    00a0 - f7 21 bc ab fd 21 be 6e-ab 57 e0 0c d5 4f 60 11   .!...!.n.W...O\`.
+    00b0 - ee 60 ab 83 b0 bf 5e d6-6a 2f 29 33 0b 97 1c 09   .\`....^.j/)3....
+    00c0 - 9d bf 84 61 ce 76 3b 25-e1 42 db dc 2d c0 0e 84   ...a.v;%.B..-...
+    00d0 - a0 88 41 3b 5b 07 c2 9c-a2 7c a0 64 13 c4 27 e1   ..A;[....|.d..&#x27;.
+
+    Start Time: 1765932835
+    Timeout   : 7200 (sec)
+    Verify return code: 18 (self-signed certificate)
+    Extended master secret: no
+    Max Early Data: 0
+---
+read R BLOCK
+kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx
+KEYUPDATE
+closed</code></pre>
+<p>I tried to openssl every port that was open, but I was only able to get two ports that communicate with SSL/TLS, which are 31518 and 31790. But when I tried to put the current level’s password, but kept getting Keyupdated even with port 31790.</p>
+<p>I kept reading the manpages, and it says that certain letters like Q, R, K, and k. With these letters, the system will think you’re trying to put in a command, so you need to put in -quiet or -ign_eof.</p>
+<pre><code>openssl s_client -connect localhost:31790 -ign_eof
+CONNECTED(00000003)
+Can&#x27;t use SSL_get_servername
+depth=0 CN = SnakeOil
+verify error:num=18:self-signed certificate
+verify return:1
+depth=0 CN = SnakeOil
+verify return:1
+---
+Certificate chain
+ 0 s:CN = SnakeOil
+   i:CN = SnakeOil
+   a:PKEY: rsaEncryption, 4096 (bit); sigalg: RSA-SHA256
+   v:NotBefore: Jun 10 03:59:50 2024 GMT; NotAfter: Jun  8 03:59:50 2034 GMT
+---
+Server certificate
+-----BEGIN CERTIFICATE-----
+MIIFBzCCAu+gAwIBAgIUBLz7DBxA0IfojaL/WaJzE6Sbz7cwDQYJKoZIhvcNAQEL
+BQAwEzERMA8GA1UEAwwIU25ha2VPaWwwHhcNMjQwNjEwMDM1OTUwWhcNMzQwNjA4
+MDM1OTUwWjATMREwDwYDVQQDDAhTbmFrZU9pbDCCAiIwDQYJKoZIhvcNAQEBBQAD
+ggIPADCCAgoCggIBANI+P5QXm9Bj21FIPsQqbqZRb5XmSZZJYaam7EIJ16Fxedf+
+jXAv4d/FVqiEM4BuSNsNMeBMx2Gq0lAfN33h+RMTjRoMb8yBsZsC063MLfXCk4p+
+09gtGP7BS6Iy5XdmfY/fPHvA3JDEScdlDDmd6Lsbdwhv93Q8M6POVO9sv4HuS4t/
+jEjr+NhE+Bjr/wDbyg7GL71BP1WPZpQnRE4OzoSrt5+bZVLvODWUFwinB0fLaGRk
+GmI0r5EUOUd7HpYyoIQbiNlePGfPpHRKnmdXTTEZEoxeWWAaM1VhPGqfrB/Pnca+
+vAJX7iBOb3kHinmfVOScsG/YAUR94wSELeY+UlEWJaELVUntrJ5HeRDiTChiVQ++
+wnnjNbepaW6shopybUF3XXfhIb4NvwLWpvoKFXVtcVjlOujF0snVvpE+MRT0wacy
+tHtjZs7Ao7GYxDz6H8AdBLKJW67uQon37a4MI260ADFMS+2vEAbNSFP+f6ii5mrB
+18cY64ZaF6oU8bjGK7BArDx56bRc3WFyuBIGWAFHEuB948BcshXY7baf5jjzPmgz
+mq1zdRthQB31MOM2ii6vuTkheAvKfFf+llH4M9SnES4NSF2hj9NnHga9V08wfhYc
+x0W6qu+S8HUdVF+V23yTvUNgz4Q+UoGs4sHSDEsIBFqNvInnpUmtNgcR2L5PAgMB
+AAGjUzBRMB0GA1UdDgQWBBTPo8kfze4P9EgxNuyk7+xDGFtAYzAfBgNVHSMEGDAW
+gBTPo8kfze4P9EgxNuyk7+xDGFtAYzAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3
+DQEBCwUAA4ICAQAKHomtmcGqyiLnhziLe97Mq2+Sul5QgYVwfx/KYOXxv2T8ZmcR
+Ae9XFhZT4jsAOUDK1OXx9aZgDGJHJLNEVTe9zWv1ONFfNxEBxQgP7hhmDBWdtj6d
+taqEW/Jp06X+08BtnYK9NZsvDg2YRcvOHConeMjwvEL7tQK0m+GVyQfLYg6jnrhx
+egH+abucTKxabFcWSE+Vk0uJYMqcbXvB4WNKz9vj4V5Hn7/DN4xIjFko+nREw6Oa
+/AUFjNnO/FPjap+d68H1LdzMH3PSs+yjGid+6Zx9FCnt9qZydW13Miqg3nDnODXw
++Z682mQFjVlGPCA5ZOQbyMKY4tNazG2n8qy2famQT3+jF8Lb6a4NGbnpeWnLMkIu
+jWLWIkA9MlbdNXuajiPNVyYIK9gdoBzbfaKwoOfSsLxEqlf8rio1GGcEV5Hlz5S2
+txwI0xdW9MWeGWoiLbZSbRJH4TIBFFtoBG0LoEJi0C+UPwS8CDngJB4TyrZqEld3
+rH87W+Et1t/Nepoc/Eoaux9PFp5VPXP+qwQGmhir/hv7OsgBhrkYuhkjxZ8+1uk7
+tUWC/XM0mpLoxsq6vVl3AJaJe1ivdA9xLytsuG4iv02Juc593HXYR8yOpow0Eq2T
+U5EyeuFg5RXYwAPi7ykw1PW7zAPL4MlonEVz+QXOSx6eyhimp1VZC11SCg==
+-----END CERTIFICATE-----
+subject=CN = SnakeOil
+issuer=CN = SnakeOil
+---
+No client certificate CA names sent
+Peer signing digest: SHA256
+Peer signature type: RSA-PSS
+Server Temp Key: X25519, 253 bits
+---
+SSL handshake has read 2103 bytes and written 373 bytes
+Verification error: self-signed certificate
+---
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Server public key is 4096 bit
+Secure Renegotiation IS NOT supported
+Compression: NONE
+Expansion: NONE
+No ALPN negotiated
+Early data was not sent
+Verify return code: 18 (self-signed certificate)
+---
+---
+Post-Handshake New Session Ticket arrived:
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : TLS_AES_256_GCM_SHA384
+    Session-ID: 12F1CFB98B1977F7279AE5CF8F724EB69158D11419F9D6F811CEC54F75FFE69D
+    Session-ID-ctx:
+    Resumption PSK: 82CB360A3AED83665F2E5363B97F5F21737B4A1F49FBA0D7B8CD9DA78AABFDB68961848FD6B96873DA81B0C5B78C5A18
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    TLS session ticket lifetime hint: 300 (seconds)
+    TLS session ticket:
+    0000 - 87 e3 3a 29 d2 a1 0e aa-46 bc 76 20 63 d5 f5 2d   ..:)....F.v c..-
+    0010 - da aa 5c b8 61 1a 29 20-66 f3 cd 9c 98 05 a8 a0   ..\\.a.) f.......
+    0020 - 7f 45 c6 db 65 f3 76 79-ef 7c a1 20 e9 52 b0 15   .E..e.vy.|. .R..
+    0030 - 45 df cc ae be a3 91 6c-87 74 ad 76 ad 5d 8d b9   E......l.t.v.]..
+    0040 - 4c 25 35 0a 5c 89 6b aa-e8 f6 23 eb ba 0f 71 33   L%5.\\.k...#...q3
+    0050 - c3 09 fe 39 c3 b9 53 35-fc ae d1 ae 17 64 df c8   ...9..S5.....d..
+    0060 - d5 38 99 86 df 81 63 7b-c1 e6 ef 49 95 13 30 6f   .8....c{...I..0o
+    0070 - 89 e6 b9 4c fb 36 58 5d-d3 5c 6d 82 3a 6f 4a d2   ...L.6X].\\m.:oJ.
+    0080 - fb e1 8f 66 2d 1c 6f c3-2d 27 c9 0c f2 b2 5a 77   ...f-.o.-&#x27;....Zw
+    0090 - 5f 4f e1 41 c0 69 a4 7b-3d b3 a0 13 60 a3 1b fa   _O.A.i.{=...\`...
+    00a0 - 60 ab 87 b6 7b 0a ee 6e-ad 30 ad 92 37 6f 2d 99   \`...{..n.0..7o-.
+    00b0 - a1 e6 42 12 45 1e ea 63-86 4f 75 04 2d e9 8f 20   ..B.E..c.Ou.-..
+    00c0 - d2 e6 fc 61 f7 df 72 a1-b4 fa 0f 5d 57 37 29 39   ...a..r....]W7)9
+    00d0 - 62 7b a9 f9 3d d5 2a 71-7f d2 bc e6 f7 10 62 eb   b{..=.*q......b.
+
+    Start Time: 1765932300
+    Timeout   : 7200 (sec)
+    Verify return code: 18 (self-signed certificate)
+    Extended master secret: no
+    Max Early Data: 0
+---
+read R BLOCK
+---
+Post-Handshake New Session Ticket arrived:
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : TLS_AES_256_GCM_SHA384
+    Session-ID: B51DFAA3F3032E8388EF25A4EB8BAD5B563AED687334AC28B03CDC3BCE6DC7C3
+    Session-ID-ctx:
+    Resumption PSK: 55EEA8F49B56E942112373A6989F0610685C52F9951396C40D29765679837D3F141C8E36AA7458E14542C1820DB7195E
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    TLS session ticket lifetime hint: 300 (seconds)
+    TLS session ticket:
+    0000 - 87 e3 3a 29 d2 a1 0e aa-46 bc 76 20 63 d5 f5 2d   ..:)....F.v c..-
+    0010 - ff 7c c7 f6 39 2e 61 95-a8 c6 7d 85 d9 ff 97 d5   .|..9.a...}.....
+    0020 - 64 27 e3 ee 3e 8d a5 c3-51 1e da da e5 e1 77 76   d&#x27;..&gt;...Q.....wv
+    0030 - 66 82 93 77 f3 e8 39 d0-b7 db 32 01 0b 2e f2 e9   f..w..9...2.....
+    0040 - 8d 19 23 99 c0 43 5a 84-e3 b9 7b f8 d6 9b 02 ef   ..#..CZ...{.....
+    0050 - 21 63 f2 02 bb a6 48 d6-f0 f2 d4 9a ea e4 b9 99   !c....H.........
+    0060 - 19 bc cb 71 e6 df 31 0a-b2 df 24 d5 02 a8 a6 5b   ...q..1...$....[
+    0070 - e5 52 bc b2 e8 12 1b 30-83 ab 60 55 b5 21 3f 12   .R.....0..\`U.!?.
+    0080 - cc e9 48 d1 a1 e6 8a 8e-25 fb a1 4b 7d 5b 47 fa   ..H.....%..K}[G.
+    0090 - d2 0a f9 c4 17 df d5 64-45 5e da b8 24 55 e4 df   .......dE^..$U..
+    00a0 - 11 91 b3 be 2d 0a 0b 34-97 1e f4 67 b8 19 89 95   ....-..4...g....
+    00b0 - 75 a5 1f 8e a4 c9 46 e2-d6 b6 c2 04 e4 e8 e0 19   u.....F.........
+    00c0 - 20 d1 1c f8 a9 33 95 81-ed dd 3e 2a ad 6d 8f b4    ....3....&gt;*.m..
+    00d0 - 9b 81 c0 84 e6 22 d0 f0-0c 7f 8f 32 8d 51 f4 d8   .....&quot;.....2.Q..
+
+    Start Time: 1765932300
+    Timeout   : 7200 (sec)
+    Verify return code: 18 (self-signed certificate)
+    Extended master secret: no
+    Max Early Data: 0
+---
+read R BLOCK
+openssl s_client -connect localhost:31790 -ign_eof
+Wrong! Please enter the correct current password.
+closed
+bandit16@bandit:~$ openssl s_client -connect localhost:31790 -ign_eof
+CONNECTED(00000003)
+Can&#x27;t use SSL_get_servername
+depth=0 CN = SnakeOil
+verify error:num=18:self-signed certificate
+verify return:1
+depth=0 CN = SnakeOil
+verify return:1
+---
+Certificate chain
+ 0 s:CN = SnakeOil
+   i:CN = SnakeOil
+   a:PKEY: rsaEncryption, 4096 (bit); sigalg: RSA-SHA256
+   v:NotBefore: Jun 10 03:59:50 2024 GMT; NotAfter: Jun  8 03:59:50 2034 GMT
+---
+Server certificate
+-----BEGIN CERTIFICATE-----
+MIIFBzCCAu+gAwIBAgIUBLz7DBxA0IfojaL/WaJzE6Sbz7cwDQYJKoZIhvcNAQEL
+BQAwEzERMA8GA1UEAwwIU25ha2VPaWwwHhcNMjQwNjEwMDM1OTUwWhcNMzQwNjA4
+MDM1OTUwWjATMREwDwYDVQQDDAhTbmFrZU9pbDCCAiIwDQYJKoZIhvcNAQEBBQAD
+ggIPADCCAgoCggIBANI+P5QXm9Bj21FIPsQqbqZRb5XmSZZJYaam7EIJ16Fxedf+
+jXAv4d/FVqiEM4BuSNsNMeBMx2Gq0lAfN33h+RMTjRoMb8yBsZsC063MLfXCk4p+
+09gtGP7BS6Iy5XdmfY/fPHvA3JDEScdlDDmd6Lsbdwhv93Q8M6POVO9sv4HuS4t/
+jEjr+NhE+Bjr/wDbyg7GL71BP1WPZpQnRE4OzoSrt5+bZVLvODWUFwinB0fLaGRk
+GmI0r5EUOUd7HpYyoIQbiNlePGfPpHRKnmdXTTEZEoxeWWAaM1VhPGqfrB/Pnca+
+vAJX7iBOb3kHinmfVOScsG/YAUR94wSELeY+UlEWJaELVUntrJ5HeRDiTChiVQ++
+wnnjNbepaW6shopybUF3XXfhIb4NvwLWpvoKFXVtcVjlOujF0snVvpE+MRT0wacy
+tHtjZs7Ao7GYxDz6H8AdBLKJW67uQon37a4MI260ADFMS+2vEAbNSFP+f6ii5mrB
+18cY64ZaF6oU8bjGK7BArDx56bRc3WFyuBIGWAFHEuB948BcshXY7baf5jjzPmgz
+mq1zdRthQB31MOM2ii6vuTkheAvKfFf+llH4M9SnES4NSF2hj9NnHga9V08wfhYc
+x0W6qu+S8HUdVF+V23yTvUNgz4Q+UoGs4sHSDEsIBFqNvInnpUmtNgcR2L5PAgMB
+AAGjUzBRMB0GA1UdDgQWBBTPo8kfze4P9EgxNuyk7+xDGFtAYzAfBgNVHSMEGDAW
+gBTPo8kfze4P9EgxNuyk7+xDGFtAYzAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3
+DQEBCwUAA4ICAQAKHomtmcGqyiLnhziLe97Mq2+Sul5QgYVwfx/KYOXxv2T8ZmcR
+Ae9XFhZT4jsAOUDK1OXx9aZgDGJHJLNEVTe9zWv1ONFfNxEBxQgP7hhmDBWdtj6d
+taqEW/Jp06X+08BtnYK9NZsvDg2YRcvOHConeMjwvEL7tQK0m+GVyQfLYg6jnrhx
+egH+abucTKxabFcWSE+Vk0uJYMqcbXvB4WNKz9vj4V5Hn7/DN4xIjFko+nREw6Oa
+/AUFjNnO/FPjap+d68H1LdzMH3PSs+yjGid+6Zx9FCnt9qZydW13Miqg3nDnODXw
++Z682mQFjVlGPCA5ZOQbyMKY4tNazG2n8qy2famQT3+jF8Lb6a4NGbnpeWnLMkIu
+jWLWIkA9MlbdNXuajiPNVyYIK9gdoBzbfaKwoOfSsLxEqlf8rio1GGcEV5Hlz5S2
+txwI0xdW9MWeGWoiLbZSbRJH4TIBFFtoBG0LoEJi0C+UPwS8CDngJB4TyrZqEld3
+rH87W+Et1t/Nepoc/Eoaux9PFp5VPXP+qwQGmhir/hv7OsgBhrkYuhkjxZ8+1uk7
+tUWC/XM0mpLoxsq6vVl3AJaJe1ivdA9xLytsuG4iv02Juc593HXYR8yOpow0Eq2T
+U5EyeuFg5RXYwAPi7ykw1PW7zAPL4MlonEVz+QXOSx6eyhimp1VZC11SCg==
+-----END CERTIFICATE-----
+subject=CN = SnakeOil
+issuer=CN = SnakeOil
+---
+No client certificate CA names sent
+Peer signing digest: SHA256
+Peer signature type: RSA-PSS
+Server Temp Key: X25519, 253 bits
+---
+SSL handshake has read 2103 bytes and written 373 bytes
+Verification error: self-signed certificate
+---
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Server public key is 4096 bit
+Secure Renegotiation IS NOT supported
+Compression: NONE
+Expansion: NONE
+No ALPN negotiated
+Early data was not sent
+Verify return code: 18 (self-signed certificate)
+---
+---
+Post-Handshake New Session Ticket arrived:
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : TLS_AES_256_GCM_SHA384
+    Session-ID: C53810CB1A179DCBAD6069ED517F86F976A62CD37C03F7A6ACC9E732B644EC0A
+    Session-ID-ctx:
+    Resumption PSK: 9A01F201A098348D436D577BF988D64E245914C0E5F891F00C7C72F8E7EA49F6DE860AC8570F4EB17B5573649BF1FE36
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    TLS session ticket lifetime hint: 300 (seconds)
+    TLS session ticket:
+    0000 - 87 e3 3a 29 d2 a1 0e aa-46 bc 76 20 63 d5 f5 2d   ..:)....F.v c..-
+    0010 - 06 28 58 1e 8e 36 f0 9e-67 df 85 b0 63 0f 17 79   .(X..6..g...c..y
+    0020 - 7e a8 b1 ae 1b 30 73 83-08 ba 2d 8e 58 9b 2b f6   ~....0s...-.X.+.
+    0030 - ba e6 34 d2 e1 7d 65 6f-7b c2 16 a2 0c 0e 50 7f   ..4..}eo{.....P.
+    0040 - 71 aa ff c1 a7 58 26 c5-5b 81 21 16 76 22 bb 06   q....X&amp;.[.!.v&quot;..
+    0050 - 14 82 a5 2e 8b 3f dd 9e-af 12 df 29 1e 40 94 86   .....?.....).@..
+    0060 - 3b 88 60 8d b2 1f ea d1-51 48 9c 62 ce 5d d6 a4   ;.\`.....QH.b.]..
+    0070 - 91 e0 aa 20 9c 99 ed b1-89 02 d1 9a 30 cb f1 f7   ... ........0...
+    0080 - 44 de 6c a7 ab b6 3a 83-e6 bd 62 bd f2 36 a3 27   D.l...:...b..6.&#x27;
+    0090 - 4b c8 66 f5 4a 8f 01 a8-a4 b6 68 c6 fc db d5 67   K.f.J.....h....g
+    00a0 - 1c 73 f1 63 94 65 06 70-bc a5 07 c4 2e 5a d8 e5   .s.c.e.p.....Z..
+    00b0 - 3a 49 d1 7a 28 95 c3 82-03 9f 21 bd 44 bd 77 ec   :I.z(.....!.D.w.
+    00c0 - f7 4a a3 6c 23 15 94 3f-b3 a6 67 b6 7d 4f 3d d6   .J.l#..?..g.}O=.
+    00d0 - e9 6d 8d 91 9c 19 cb cb-1c ab fa 51 7d f6 b0 b0   .m.........Q}...
+
+    Start Time: 1765932305
+    Timeout   : 7200 (sec)
+    Verify return code: 18 (self-signed certificate)
+    Extended master secret: no
+    Max Early Data: 0
+---
+read R BLOCK
+---
+Post-Handshake New Session Ticket arrived:
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : TLS_AES_256_GCM_SHA384
+    Session-ID: 9A92D5F15EE45B91BCC1A90641F7A58E18C044929319FFE8BB2E3F9BB64D6125
+    Session-ID-ctx:
+    Resumption PSK: 44C575F2162355B1C37E2ECE202D96E753E2567A083894CD2E8874F5FE132B3E05699FCC7B68B34D72EF80E926DEE72A
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    TLS session ticket lifetime hint: 300 (seconds)
+    TLS session ticket:
+    0000 - 87 e3 3a 29 d2 a1 0e aa-46 bc 76 20 63 d5 f5 2d   ..:)....F.v c..-
+    0010 - a7 27 ff 3d 91 9a d6 24-0b ba a9 d6 3f 1c bd 72   .&#x27;.=...$....?..r
+    0020 - bb 88 66 d0 d0 b7 2a 6f-b2 c7 3f b3 ad 0f a9 1e   ..f...*o..?.....
+    0030 - b8 10 68 97 6b 36 df f3-ea af 23 67 0a 3e 3b 4f   ..h.k6....#g.&gt;;O
+    0040 - 86 78 8b b7 ad 4a c7 4e-15 2d a3 53 1c c8 60 93   .x...J.N.-.S..\`.
+    0050 - a3 8b fd 54 2b 53 81 7b-4c f2 56 0a c4 cb d4 67   ...T+S.{L.V....g
+    0060 - 56 17 16 53 06 19 68 34-84 32 93 85 35 55 43 40   V..S..h4.2..5UC@
+    0070 - f7 aa 97 b4 ea 79 be 84-10 32 19 69 95 fe 16 00   .....y...2.i....
+    0080 - 2f 26 ab 42 93 3a d6 9d-40 66 61 62 eb 87 e8 50   /&amp;.B.:..@fab...P
+    0090 - 37 d0 ae fe 64 6e 4b 51-8e 7a 6f c5 30 70 18 6d   7...dnKQ.zo.0p.m
+    00a0 - ce 93 c0 66 ef c3 fd 01-9a 05 b4 b0 55 70 05 63   ...f........Up.c
+    00b0 - 02 85 27 19 7d 02 81 af-99 02 8f 5c 2b 98 b3 59   ..&#x27;.}......\\+..Y
+    00c0 - 30 9d c2 0f ad 26 92 05-79 ec 55 c6 7b 5e 9c ee   0....&amp;..y.U.{^..
+    00d0 - f8 c5 d3 7a b3 fb f1 fe-2f 42 58 e8 f0 b9 16 c4   ...z..../BX.....
+
+    Start Time: 1765932305
+    Timeout   : 7200 (sec)
+    Verify return code: 18 (self-signed certificate)
+    Extended master secret: no
+    Max Early Data: 0
+---
+read R BLOCK</code></pre>
+<pre><code>read R BLOCK
+kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx
+Correct!
+[RSA private key omitted — you get your own copy when you run this level]</code></pre>
+<p>After trying -ign_eof in the command, -ign_eof tells OpenSSL to ignore the end of files, but to keep the TLS connection. But after putting in the current level’s password, I was able to get the private key, and then I remembered what to do from level 14</p>
+<pre><code>bandit16@bandit:~$ exit
+almer@LAPTOP-OHBL0RFG:~$  echo &#x27;[RSA private key omitted — you get your own copy when you run this level]&#x27; &gt; private.key</code></pre>
+<p>So after getting the private I exited from the bandit host, and I echoed the private key and redirected it into a new file.</p>
+<pre><code>almer@LAPTOP-OHBL0RFG:~$ chmod 700 private.key
+almer@LAPTOP-OHBL0RFG:~$ ssh bandit17@bandit.labs.overthewire.org -p 2220 -i private.key</code></pre>
+<p>Then ssh into the next bandit level by -i, which identifies the private key, and I was able to get in.</p>`},
+  {id:"17-18", label:"Bandit 17-18", cmd:"ls", body:`<pre><code>ls
+passwords.new  passwords.old
+cat passswords.new
+cat passwords.old</code></pre>
+<p>So I ls to see what files were in the directory and then I decided to see what’s inside the files. There was a list of passwords in those files.</p>
+<pre><code>diff passwords.new passwords.old 
+42c42
+&lt; x2gLTTjFwMOhQ8oWNbMN362QKxfRqGlO
+---
+&gt; BMIOFKM7CRSLI97voLp3TD80NAq5exxk</code></pre>
+<p>diff is used to show what’s different between those two files, and it shows that the top passwords were different in the <a href="http://passwords.new" target="_blank" rel="noopener">passwords.new</a> file. While at the bottom, passwords show what was different in the passwords.old file. So our password is <code>x2gLTTjFwMOhQ8oWNbMN362QKxfRqGlO</code> since it says the next level’s password is in the passwords.new file</p>`},
+  {id:"18-19", label:"Bandit 18-19", cmd:"ssh bandit18@bandit.labs.overthewire.org -p 2220", body:`<pre><code>ssh bandit18@bandit.labs.overthewire.org -p 2220
+Welcome to OverTheWire!
+
+If you find any problems, please report them to the #wargames channel on
+discord or IRC.
+
+--[ Playing the games ]--
+
+  This machine might hold several wargames.
+  If you are playing &quot;somegame&quot;, then:
+
+    * USERNAMES are somegame0, somegame1, ...
+    * Most LEVELS are stored in /somegame/.
+    * PASSWORDS for each level are stored in /etc/somegame_pass/.
+
+  Write-access to homedirectories is disabled. It is advised to create a
+  working directory with a hard-to-guess name in /tmp/.  You can use the
+  command &quot;mktemp -d&quot; in order to generate a random and hard to guess
+  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc
+  restricted so that users cannot snoop on eachother. Files and directories
+  with easily guessable or short names will be periodically deleted! The /tmp
+  directory is regularly wiped.
+  Please play nice:
+
+    * don&#x27;t leave orphan processes running
+    * don&#x27;t leave exploit-files laying around
+    * don&#x27;t annoy other players
+    * don&#x27;t post passwords or spoilers
+    * again, DONT POST SPOILERS!
+      This includes writeups of your solution on your blog or website!
+
+--[ Tips ]--
+
+  This machine has a 64bit processor and many security-features enabled
+  by default, although ASLR has been switched off.  The following
+  compiler flags might be interesting:
+
+    -m32                    compile for 32bit
+    -fno-stack-protector    disable ProPolice
+    -Wl,-z,norelro          disable relro
+
+  In addition, the execstack tool can be used to flag the stack as
+  executable on ELF binaries.
+
+  Finally, network-access is limited for most levels by a local
+  firewall.
+
+--[ Tools ]--
+
+ For your convenience we have installed a few useful tools which you can find
+ in the following locations:
+
+    * gef (https://github.com/hugsy/gef) in /opt/gef/
+    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/
+    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/
+    * pwntools (https://github.com/Gallopsled/pwntools)
+    * radare2 (http://www.radare.org/)
+
+--[ More information ]--
+
+  For more information regarding individual wargames, visit
+  http://www.overthewire.org/wargames/
+
+  For support, questions or comments, contact us on discord or IRC.
+
+  Enjoy your stay!
+
+Byebye !
+Connection to bandit.labs.overthewire.org closed.</code></pre>
+<p>Once I tried to ssh into Bandit level 18, and once I tried putting in the password, it said Connection closed. But the next level password is stored in a file called readme, and the reason we’re getting kicked out is because .bashrc was modified to log us out.</p>
+<pre><code>ssh bandit18@bandit.labs.overthewire.org -p 2220 cat readme</code></pre>
+<p>So we did it like this because with SSH, you could end ssh with another command. If the command is specified, then it will be done on the remote host instead of logging into the shell. Then we have to use cat to see what’s inside the readme file:</p>
+<p>after entering the bandit18 level password. It gave me bandit 19’s level password: <code>cGWpMaKXVwDUNgPAVJbWYuGHVn9zl3j8</code></p>`},
+  {id:"19-20", label:"Bandit 19-20", cmd:"ls", body:`<pre><code>ls
+bandit20-do
+file bandit20-do
+bandit20-do: setuid ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=38f1351d0068ccbbace0e437f34859de85e63025, for GNU/Linux 3.2.0, not stripped</code></pre>
+<p>I decided to ls the directory to see what files or directories we have. The only one that shows up is bandit20-do. I wanted to see what type of file bandit20-do is, and it is a setuid fil,e which means set user id. Setuid is basically a file permission that lets users use the root permissions instead of the user executing only within that file</p>
+<pre><code>./bandit20-do whoami
+bandit20</code></pre>
+<p>Then ./ is the current directory, and we wanted to see the owner of the bandit20-do file, so that’s why we use whoami. We see that the owner is bandit20</p>
+<pre><code>./bandit20-do cat /etc/bandit_pass/bandit20</code></pre>
+<p>So we go from the current directory to the bandit20-do file because the owner is bandit20, and we need the owner to get access into the bandit20 file. Then I cat into the pathway to get the password for bandit level 20, which is why I did /etc/bandit_pass/bandit20. Since we were the owners of bandit20, we were allowed in the bandit20 file.</p>
+<p>So the password was: <code>0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO</code></p>`},
+  {id:"20-21", label:"Bandit 20-21", cmd:"ls", body:`<pre><code>ls 
+suconnect
+./suconnect (port number)</code></pre>
+<p>So we have a file called suconnect and with suconnect you have to add any port number at the end. Then we need a second terminal for the port number to connect to and listen to as well.</p>
+<pre><code>nc -lvp 10000
+Listening on 0.0.0.0 10000
+Connection received on localhost 41108</code></pre>
+<p>I decided to the netcat because it allows two terminals talk to each other over ports. -l means listen, -v means to get some more information, -p means to go to the port we’re trying to listen to. You could choose any port number so I wanted to choose 10000</p>
+<p>Then we see on the second terminal that were listening to the port 10000 and that the first terminal received our connection on local on port 41108</p>
+<pre><code>Listening on 0.0.0.0 9999
+Connection received on localhost 41108
+0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO
+EeoULMCra2q0dSkYj561DX7s1CpBuOBt</code></pre>
+<p>After putting in the current level’s password in the second terminal we recieve the next level’s password</p>
+<pre><code>Read: 0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO
+Password matches, sending next password</code></pre>
+<p>In our first terminal we saw that read our password from the second terminal showing that it actually connected. It also say that the password matches so that means our password is correct. Then we were able to get the next password for the next level: <code>EeoULMCra2q0dSkYj561DX7s1CpBuOBt</code></p>`},
+  {id:"21-22", label:"Bandit 21-22", cmd:"cd /etc/cron.d", body:`<pre><code>cd /etc/cron.d
+ls
+behemoth4_cleanup  cronjob_bandit22  cronjob_bandit24  leviathan5_cleanup    otw-tmp-dir
+clean_tmp          cronjob_bandit23  e2scrub_all       manpage3_resetpw_job  sysstat</code></pre>
+<p>In this level, we have to learn about cron. Cron is basically a schedule task like let’s say I want to schedule a certain task at a certain tim,e that’s when I would use cron.</p>
+<p>I had to change the directory because it told me that I had to look for the configuration inside it</p>
+<p>After I cd the directory the ls to see what’s inside, we have a bunch of different files and directory.</p>
+<pre><code>cat cronjob_bandit22
+@reboot bandit22 /usr/bin/cronjob_bandit22.sh &amp;&gt; /dev/null
+* * * * * bandit22 /usr/bin/cronjob_bandit22.sh &amp;&gt; /dev/null</code></pre>
+<p>Once I cat cronjob_bandit22, it shows that at reboot, the root user bandit22 is running /usr/bin/cronjob_bandit22.sh, and the output it is giving is /dev/null.</p>
+<p>The ***** represents the cron scheduling, like the minute, hour, day, month, and day of week</p>
+<pre><code>cat  /usr/bin/cronjob_bandit22.sh
+#!/bin/bash
+chmod 644 /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+cat /etc/bandit_pass/bandit22 &gt; /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv</code></pre>
+<p>So I wanted to see what bandit22 was running, so I decided to cat the pathway it was running. What I saw is that it’s using bash with a chmod 644, which means owners read and write, users read, group read in a pathway of /tmp/<code>t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv</code></p>
+<p>Then we also see that the /etc/bandit_pass/bandit2 is being redirected to /tmp/<code>t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv</code>, and normally the password is usually held in /etc/bandit_pass/bandit22</p>
+<pre><code>cat  /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+tRae0UfB9v0UzbCdn9cY0gQnds9GF58Q</code></pre>
+<p>After cat to see what&#x27;s inside that file, I was able to get next level’s password: <code>tRae0UfB9v0UzbCdn9cY0gQnds9GF58Q</code></p>`},
+  {id:"22-23", label:"Bandit 22-23", cmd:"cd /etc/cron.d", body:`<pre><code>cd /etc/cron.d
+ls
+behemoth4_cleanup  cronjob_bandit22  cronjob_bandit24  leviathan5_cleanup    otw-tmp-dir
+clean_tmp          cronjob_bandit23  e2scrub_all       manpage3_resetpw_job  sysstat</code></pre>
+<p>I cd to change the directory to cron.d because again we are still looking at this directory then I wanted to see what’s inside the directory, and I see there are different file to see and one directory but it’s pointless.</p>
+<pre><code>cat cronjob_bandit23
+@reboot bandit23 /usr/bin/cronjob_bandit23.sh  &amp;&gt; /dev/null
+* * * * * bandit23 /usr/bin/cronjob_bandit23.sh  &amp;&gt; /dev/null</code></pre>
+<p>I wanted to see what’s inside the cronjob_bandit23 file, and all I got was that at the reboot the root user bandit23 runs cronjob_bandit23.sh, then the output is /dev/null.</p>
+<p>Again with *****, which is the minute, hour, day, month, and day of week for the root user and running the file cronjob_bandit23.sh</p>
+<pre><code>cat  /usr/bin/cronjob_bandit23.sh
+#!/bin/bash
+
+myname=$(whoami)
+mytarget=$(echo I am user $myname | md5sum | cut -d &#x27; &#x27; -f 1)
+
+echo &quot;Copying passwordfile /etc/bandit_pass/$myname to /tmp/$mytarget&quot;
+
+cat /etc/bandit_pass/$myname &gt; /tmp/$mytarget</code></pre>
+<p>Once I saw what’s inside the /usr/bin/cronjob_bandit23.sh. We see that it’s using bash. Also there is a shell script in it.</p>
+<p>To get the name of the file, you would have to type whoami, and it would be the user but this time we could assume it’s bandit23 because that’s the user were trying to get the password from. To get your mytarget, you need to type out the command echo I am user $myname | md5sum | cut -d &#x27; &#x27; -f 1.</p>
+<p>echo means print out text</p>
+<p>You get $myname from whoami</p>
+<p>md5sum is a text that turns into fixed length hash</p>
+<p>cut means cut out columns, -d means delimiter bascially a separator for columns, ‘ ‘ is just a space, -f field number, and 1</p>
+<p>After running that command I was able to get the md5 hash of bandit23, which was <code>8ca319486bfbbc3663ea0fbe81326349</code></p>
+<pre><code>echo &quot;Copying passwordfile /etc/bandit_pass/bandit23 to /tmp/8ca319486bfbbc3663ea0fbe81326349&quot;
+Copying passwordfile /etc/bandit_pass/bandit23 to /tmp/8ca319486bfbbc3663ea0fbe81326349</code></pre>
+<p>So I decided to echo to copy the password file from /etc/bandit_pass/bandit23 to /tmp/<code>8ca319486bfbbc3663ea0fbe81326349</code></p>
+<pre><code>cat /tmp/8ca319486bfbbc3663ea0fbe81326349</code></pre>
+<p>The only thing left to do is to cat the file where the bandit23 password got copied to so after I did that, I was able to get bandit23 password, which was: <code>0Zf11ioIjMVN551jX3CmStKLYqjk54Ga</code></p>`},
+  {id:"23-24", label:"Bandit 23-24", cmd:"cd /etc/cron.d", body:`<pre><code>cd /etc/cron.d
+ls
+behemoth4_cleanup  cronjob_bandit22  cronjob_bandit24  leviathan5_cleanup    otw-tmp-dir
+clean_tmp          cronjob_bandit23  e2scrub_all       manpage3_resetpw_job  sysstat</code></pre>
+<pre><code>cat cronjob_bandit24
+@reboot bandit24 /usr/bin/cronjob_bandit24.sh &amp;&gt; /dev/null
+* * * * * bandit24 /usr/bin/cronjob_bandit24.sh &amp;&gt; /dev/null
+cat /usr/bin/cronjob_bandit24.sh
+#!/bin/bash
+
+myname=$(whoami)
+
+cd /var/spool/$myname/foo
+echo &quot;Executing and deleting all scripts in /var/spool/$myname/foo:&quot;
+for i in * .*;
+do
+    if [ &quot;$i&quot; != &quot;.&quot; -a &quot;$i&quot; != &quot;..&quot; ];
+    then
+        echo &quot;Handling $i&quot;
+        owner=&quot;$(stat --format &quot;%U&quot; ./$i)&quot;
+        if [ &quot;\${owner}&quot; = &quot;bandit23&quot; ]; then
+            timeout -s 9 60 ./$i
+        fi
+        rm -f ./$i
+    fi
+done</code></pre>
+<pre><code>mkdir /tmp/macy
+cd /tmp/macy</code></pre>
+<pre><code>nano macyscript.sh
+#!/bin/bash/
+
+cat /etc/bandit_pass/bandit24 &gt; /tmp/macy/password.txt</code></pre>
+<pre><code>chmod 777 .
+chmod 777 macyscript.sh
+/tmp/macy$ ls -la
+total 444
+drwxrwxrwx    2 bandit23 bandit23   4096 Dec 21 08:53 .
+drwxrwx-wt 7094 root     root     438272 Dec 21 09:05 ..
+-rwxrwxrwx    1 bandit23 bandit23     69 Dec 21 08:05 macyscript.sh</code></pre>
+<pre><code>cp macyscript.sh /var/spool/bandit24/foo
+ls
+macyscript.sh  password.txt</code></pre>
+<pre><code>cat password.txt
+gb8KRRCsshuZXI0tUuR6ypOFjiZbf3G8</code></pre>`},
+  {id:"24-25", label:"Bandit 24-25", cmd:"ls -a", body:`<pre><code>ls -a
+.  ..  .bash_logout  .bashrc  .profile</code></pre>
+<pre><code>ls -a -l
+total 20
+drwxr-xr-x   2 root root 4096 Oct 14 09:25 .
+drwxr-xr-x 150 root root 4096 Oct 14 09:29 ..
+-rw-r--r--   1 root root  220 Mar 31  2024 .bash_logout
+-rw-r--r--   1 root root 3851 Oct 14 09:19 .bashrc
+-rw-r--r--   1 root root  807 Mar 31  2024 .profile</code></pre>
+<pre><code>mkdir /tmp/target
+cd /tmp/target</code></pre>
+<pre><code>bandit24@bandit:/tmp/target$ nano brute.sh
+#!/bin/bash
+
+for i in {0000...9999}
+do
+		echo &quot;gb8KRRCsshuZXI0tUuR6ypOFjiZbf3G8 $i&quot;
+done</code></pre>
+<pre><code>ls -l brute.sh
+-rw-rw-r-- 1 bandit24 bandit24 85 Dec 22 02:14 brute.sh
+chmod 777 brute.sh
+ls -l brute.sh
+-rwxrwxrwx 1 bandit24 bandit24 85 Dec 22 02:14 brute.sh</code></pre>
+<pre><code>cat brute.sh
+#!/bin/bash
+
+for i in {0000...9999}
+do
+        echo &quot;gb8KRRCsshuZXI0tUuR6ypOFjiZbf3G8 $i&quot;
+done</code></pre>
+<pre><code>./brute.sh | nc localhost 30002 | grep -v wrong
+Correct!
+The password of user bandit25 is iCi86ttT4KSNe1armKiwbQNmB3YJP3q4</code></pre>`}
+];
+
+const SERIES = [
+  /* Add a project like this:
+     { slug:"my-project", title:"My Project", kind:"project", date:"2026-08-01",
+       read:"12 min", tags:["tag"], excerpt:"One line.", body:`<h3>Heading</h3><p>Text.</p>` }
+     ...into the PROJECTS array below. */
+  { slug:"bandit", title:"OverTheWire: Bandit", kind:"writeup", date:"2026-07-29",
+    tags:["overthewire","linux","ssh"], levels:BANDIT,
+    excerpt:"Every level of the Bandit wargame, start to finish - the command I used, what it returned, and why it worked." }
+];
+
+const PROJECTS = [
+  { slug:"honeypot", title:"Building a T-Pot honeypot on DigitalOcean", kind:"project",
+    date:"2026-01-21", read:"14 min", tags:["honeypot","t-pot","cloud","blue team"],
+    excerpt:"A deliberately vulnerable server left open to the internet for two hours, and what the logs showed: mostly Europe and the US East Coast, mostly root with no password, mostly port 22.",
+    body:`
+<p>A honeypot is a fake vulnerable network to trick attackers, so we are able to analyze their behavior, including how they attack and where they attack. The reason I wanted to build a honeypot is to deepen my skills and learn how attackers behave, as well as where most attackers originate from.</p>
+
+<h3>What I used</h3>
+<ul>
+  <li><b>VirtualBox</b> — 4096 MB memory, 4 CPU, Kali ISO</li>
+  <li><b>DigitalOcean</b> — Ubuntu 24.04 LTS x64, basic CPU, 8 GB memory, 4 CPU</li>
+  <li><b>T-Pot</b> — the Telekom Security repository</li>
+</ul>
+
+<h3>Creating the droplet</h3>
+<figure><img src="https://github.com/user-attachments/assets/88e4285e-6ce6-4e11-b49c-38402c73090c" alt="Choosing the San Francisco region in DigitalOcean" loading="lazy"><figcaption>Choosing the San Francisco region in DigitalOcean</figcaption></figure>
+<p>I decided to use DigitalOcean as my cloud provider because I wanted to do something a little different, since everyone does an AWS EC2 honeypot. In DigitalOcean, I created a droplet, then I chose San Francisco because I wanted to see how many attackers attack in my region.</p>
+<figure><img src="https://github.com/user-attachments/assets/c7d152c7-cc0d-4a75-bae7-44d071a0186d" alt="Selecting the Ubuntu 24.04 LTS image" loading="lazy"><figcaption>Selecting the Ubuntu 24.04 LTS image</figcaption></figure>
+<p>The next step is choosing the image for the honeypot. I decided to go with Ubuntu 24.04 LTS x64 because I've seen that it is compatible with T-Pot, and I was already comfortable with Ubuntu. T-Pot will be important because we need it for our dashboard to analyze the attackers' behavior and location.</p>
+<p>After deciding on the image, we have to choose the size — and for the honeypot, it takes up a lot of space. The minimum needed memory is 8 GB. Hence the reason I chose 8 GB and 4 CPUs. The CPU options don't matter; any option would work.</p>
+<figure><img src="https://github.com/user-attachments/assets/dd000826-06f7-4e23-a1f0-9efda6749330" alt="Picking password authentication over SSH keys" loading="lazy"><figcaption>Picking password authentication over SSH keys</figcaption></figure>
+<p>Next, I had to choose an authentication method. I decided to go with the password method because I've already done the SSH key method, and the password method is faster. With SSH keys you would have to download the key to your file and then <code>chmod</code> it so that it is only readable. Once I finished choosing the password method, I was ready to create the droplet.</p>
+<figure><img src="https://github.com/user-attachments/assets/b2a2328c-2b6c-4b40-8d6a-f07b7c1830ae" alt="The droplet once it finished provisioning" loading="lazy"><figcaption>The droplet once it finished provisioning</figcaption></figure>
+<p>This is what it looks like after I created my droplet. We are given the IPv4, which is the public IP. This will be important because we will need to SSH into this address, and this is where we will be accessing T-Pot later on. We are also given the private IP for the cloud that is being used.</p>
+
+<h3>Connecting and installing T-Pot</h3>
+<figure><img src="https://github.com/user-attachments/assets/9aaf1184-f865-4599-b010-a0b4e98b5b9a" alt="SSH'd into the droplet as root" loading="lazy"><figcaption>SSH'd into the droplet as root</figcaption></figure>
+<p>Inside VirtualBox, I went to the terminal, and before I even started I ran <code>ip a</code> to make sure my <code>eth0</code> reaches the network and shows an IP address like <code>10.XX.XX.XX</code>. Sometimes I wouldn't be able to reach the network, so I would have to disconnect the wired connection, reconnect it, then test <code>ip a</code> again. Eventually I would see an IP address under <code>eth0</code>. I SSH into <code>root@IP-Address</code> to remote into the server. I successfully got into the server — you can see <code>root@HoneyPot</code> at the bottom.</p>
+<figure><img src="https://github.com/user-attachments/assets/dac8888a-266d-41fc-b316-074207c950ca" alt="Adding a non-root user and cloning the T-Pot repository" loading="lazy"><figcaption>Adding a non-root user and cloning the T-Pot repository</figcaption></figure>
+<p>Before adding the user, I ran:</p>
+<pre><code>apt-get update &amp;&amp; apt-get upgrade -y</code></pre>
+<p>This will update the server and upgrade any tools or repositories.</p>
+<p>The reason I decided to add a user is that I need a non-root user to run the honeypot on. Running the honeypot as root can lead to compromised information. Then I had to set the password for <code>almer</code>. The password will be very important later on. The other values don't matter — you can leave them blank, because the honeypot doesn't use them.</p>
+<p><code>almer</code> has the least privileges, which is why I ran:</p>
+<pre><code>sudo usermod -aG sudo almer
+su almer
+cd /home/almer
+sudo apt install git
+git clone https://github.com/telekom-security/tpotce
+cd tpotce
+./install.sh</code></pre>
+<p><code>usermod -aG sudo</code> gives almer sudo privileges, which is like root or admin privileges. Then I switched user with <code>su almer</code>, which is why you see <code>almer@HoneyPot</code>. I moved to the home directory, made sure git was installed because the next command needs it, then cloned the T-Pot repository. When it finished cloning I changed into <code>tpotce</code>, where there are several directories and files — but the only one we need is <code>install.sh</code>.</p>
+<p>During the middle of the installation, it will show that the SSH port is now <code>64295</code>. It will also ask what installation type you want. I chose <b>h</b>, which is hive, because it is the standard T-Pot. The others are S (sensor), L (LLM), I (mini), M (mobile) and T (tarpit). Near the end, it asks you to set a web username and password, which will be important later as well.</p>
+<figure><img src="https://github.com/user-attachments/assets/79abe2f7-785c-44ac-8b9b-9c79ae82a2b3" alt="Active connections at the end of the install, showing port 64295" loading="lazy"><figcaption>Active connections at the end of the install, showing port 64295</figcaption></figure>
+<p>At the end of the installation, it shows us the active internet connections. I see that 64295 is active, which is the new port to SSH into. Then it asks us to reboot. Once we reboot, it kicks us back to our machine.</p>
+<figure><img src="https://github.com/user-attachments/assets/e001f1b1-3dab-4ebe-8f2f-0afcc2750251" alt="Reconnecting on the new SSH port" loading="lazy"><figcaption>Reconnecting on the new SSH port</figcaption></figure>
+<p>I have to SSH into the new port because the old port (22) doesn't work anymore:</p>
+<pre><code>ssh -p 64295 root@IP-Address</code></pre>
+<p>I was able to connect to the root server. <code>-p</code> means port. After this, everything should work.</p>
+<figure><img src="https://github.com/user-attachments/assets/5d233de3-7e78-4a32-a30d-c0766af74106" alt="The T-Pot dashboard on port 64297" loading="lazy"><figcaption>The T-Pot dashboard on port 64297</figcaption></figure>
+<p>Inside the browser of VirtualBox, I put <code>https://Public-IP:64297</code>. 64297 is the listening port, which I found through the telekom-security GitHub repository. The reason I did it inside VirtualBox is that when I tried to access the site from my laptop it said "unsecure" — which we expect — but it wouldn't let me advance past the warning. So I tried Firefox inside my VirtualBox and was finally able to advance. When loading, it asks for the username and password you set during the T-Pot setup.</p>
+
+<h3>Results</h3>
+<p>I let my honeypot run for less than 2 hours, and during that time I was able to get these results.</p>
+<figure><img src="https://github.com/user-attachments/assets/84ebec27-498c-41c1-868a-9314ffa6463a" alt="Attack map and event totals" loading="lazy"><figcaption>Attack map and event totals</figcaption></figure>
+<figure><img src="https://github.com/user-attachments/assets/9a19e497-247c-4914-9b73-bacc7e59b0e5" alt="Most-attempted usernames and passwords" loading="lazy"><figcaption>Most-attempted usernames and passwords</figcaption></figure>
+<figure><img src="https://github.com/user-attachments/assets/b8b2cede-5dda-40c6-a04d-9adcb1be2952" alt="Most-targeted ports" loading="lazy"><figcaption>Most-targeted ports</figcaption></figure>
+<p>I was able to see that the attackers are mostly coming from Europe and the East Coast of America. Attackers are mostly trying <code>root</code> for the username and nothing for the password. To me it is really interesting how basic the usernames and passwords they're trying are. I could also see which port they're attacking, which in this case is mostly port 22.</p>
+
+<h3>Conclusion</h3>
+<p>This was a very fun project to build, and I definitely learned a lot while I was building it. I ran into a couple of challenges, including troubleshooting my connection, missing Docker containers at times, and T-Pot not working. But in reality, this is what the IT and cyber security field is all about: running into an error, stressing about it, then figuring out a way to fix it and make it work.</p>
+<p>I am glad that I was able to fix my mistakes and finish this project. I learned a lot about blue team concepts, hands-on troubleshooting, Linux, the attacker mindset, cloud infrastructure, and networking.</p>
+<p><a href="https://github.com/AlmerGaringan/HoneyPot" target="_blank" rel="noopener">Repository on GitHub</a></p>
+` },
+
+  { slug:"pi-hole", title:"Pi-hole: a network-wide ad blocker", kind:"project",
+    date:"2025-12-01", read:"8 min", tags:["pi-hole","dns","networking","raspberry pi"],
+    excerpt:"My first project - a Raspberry Pi filtering DNS for every device on the network. 96 out of 100 on the AdBlock tester, and a crash course in DHCP, static IPs, and LAN addressing.",
+    body:`
+<p>A Pi-hole is a network-wide ad blocker and a DNS filter. The reason I decided to build a Pi-Hole is to block the ads that are in my network. I learned a lot through this project; some of the key concepts I acquired include DNS, Linux, and IP addressing.</p>
+<figure><img src="https://github.com/user-attachments/assets/3fd9718b-fb90-4151-bc03-e505554d7202" alt="The Pi-hole admin dashboard" loading="lazy"><figcaption>The Pi-hole admin dashboard</figcaption></figure>
+
+<h3>Hardware and OS</h3>
+<ul>
+  <li>Travel router</li>
+  <li>Wireless ethernet adapter</li>
+  <li>Raspberry Pi OS and Ubuntu Server</li>
+</ul>
+
+<h3>Installation</h3>
+<p>The first command when I was building this project was:</p>
+<pre><code>sudo apt update
+sudo apt full-upgrade</code></pre>
+<p>The first thing I did was update and fully upgrade my system. This allows your Pi packages to be fully updated to make sure they're up to date.</p>
+<p>Then I ran this command:</p>
+<pre><code>curl -sSL https://install.pi.hole.net | bash</code></pre>
+<p><code>curl</code> is used to fetch or retrieve the data in that URL or from the server. In <code>-sSL</code>, <code>-s</code> means silent mode, <code>-S</code> only shows errors, and <code>-L</code> follows any redirection.</p>
+<p>Bash receives what the curl command wants to fetch, then turns that input into text and runs the script line by line.</p>
+<p>After you type this command in, an installation wizard will pop up. This will allow you to customize your Pi-hole.</p>
+<p>In your router interface, you want to go to your DNS server settings and manually type out your Pi-hole IP address. A way to find out your IP address is by completing your installation, which gives you your IP address shown as <code>IPV4: (IP Address)</code>.</p>
+<figure><img src="https://github.com/user-attachments/assets/79398870-9ecb-4e79-8242-1022c46025d0" alt="Pointing the router's DNS settings at the Pi-hole" loading="lazy"><figcaption>Pointing the router's DNS settings at the Pi-hole</figcaption></figure>
+<p>Another way of finding out your Pi-hole IP address is through the CLI:</p>
+<pre><code>ip addr</code></pre>
+<p>This will give you all of the IP addresses on your Pi. So whatever interface you choose during the installation, whether it's <code>wlan0</code> or <code>eth0</code> or some other one, the IP address will be under whatever you choose.</p>
+<p>After this, I enabled my DHCP settings in my Pi-hole admin. In this, you will get a range of IP addresses to hand out from start to end, then you also have to put your router IP address, and lastly your netmask. I was able to find all of this through my travel router. In the LAN private network, I was given the start and end IP address, the netmask, and the router IP address. So I added my LAN private network into my Pi-hole DHCP server settings.</p>
+<p>Lastly, I needed to add my Pi-Hole as a client in my travel router, so I had to add my Pi to my LAN private network by putting in my Pi-Hole IPv4 address and also the static IPv6 address of my Pi-Hole. But then I realized that my WiFi connection from my travel router is different from my main router, so when I connected my devices to my travel router's WiFi, I was finally able to see my Pi-Hole work with all of my devices across my network.</p>
+
+<h3>Results</h3>
+<p>Seeing my score being a 96 out of 100 from an AdBlock tester shows that my Pi-hole works and blocks out adware, spyware, and malware queries on my network.</p>
+<figure><img src="https://github.com/user-attachments/assets/f348bc2f-dc0c-48d4-b66a-aa1b56d0ea47" alt="96 out of 100 on the AdBlock tester" loading="lazy"><figcaption>96 out of 100 on the AdBlock tester</figcaption></figure>
+<p>These are my results after 2 hours of my Pi-hole working. I noticed that there were no more pop-up ads on sites that I would visit, and I also noticed my browsing speed has gotten faster.</p>
+<figure><img src="https://github.com/user-attachments/assets/63d8625d-da33-4682-bc92-5cc317a1b70f" alt="Query stats after two hours" loading="lazy"><figcaption>Query stats after two hours</figcaption></figure>
+
+<h3>Key takeaways</h3>
+<p>Key takeaways I took from my first project were to strengthen my Linux skills and also learning about static IP, DNS, LAN, DHCP, and IP addresses. I was also able to gain hands-on experience and learn throughout this project about network security and privacy, understanding how a Pi-hole can reduce the amount of spyware, adware, and malware queries that are happening on my network.</p>
+<p>I was finally able to deepen my skills and knowledge on how IP addresses, LAN, DHCP, DNS, and malicious or unwanted queries play an important role in the IT and cyber security industry.</p>
+<p><a href="https://github.com/AlmerGaringan/Pi-Hole" target="_blank" rel="noopener">Repository on GitHub</a></p>
+` }
+];
+
+const CERTS = [
+  {name:"CompTIA Security+", org:"CompTIA", status:"in progress", cls:"wip", date:"Studying now",
+   note:"Working through the exam objectives - networking, threats, cryptography, and risk."},
+  {name:"Google Cybersecurity Professional Certificate", org:"Coursera", status:"held", cls:"held", date:"Jul 2025",
+   note:"Network defense, risk management, and incident response fundamentals."}
+];
+
+/* ------------------------------------------------------------- utilities */
+const out = document.getElementById("out");
+const input = document.getElementById("cmd");
+const ac = document.getElementById("ac");
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const coarse = matchMedia("(pointer: coarse)").matches;
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = d => new Date(d+"T00:00:00").toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}).toUpperCase();
+
+let cwd = "~";
+function setPath(p){
+  cwd = p;
+  document.getElementById("tpath").innerHTML = `<b>almer@blog</b>: <span>${esc(p)}</span>`;
+  document.querySelector(".ps1 span").textContent = p;
+}
+
+/* --------------------------------------------------------- command table */
+const COMMANDS = [
+  {cmd:"home",          label:"Back to the start",        pill:true},
+  {cmd:"help",          label:"Show every command",       pill:true},
+  {cmd:"ls",            label:"List every category",      pill:true},
+  {cmd:"ls bandit",     label:"All 26 Bandit levels",     pill:true},
+  {cmd:"ls projects",   label:"List projects",            pill:true},
+  {cmd:"ls certs",      label:"List certifications",      pill:true},
+  {cmd:"cat about.md",  label:"Read about me",            pill:true},
+  {cmd:"contact",       label:"How to reach me",          pill:false},
+  {cmd:"whoami",        label:"The one-line version",     pill:false},
+  {cmd:"clear",         label:"Wipe the screen",          pill:false}
+];
+BANDIT.forEach(l => COMMANDS.push({cmd:`cat ${l.id}`, label:`Bandit level ${l.id}`, pill:false}));
+
+/* ------------------------------------------------------------- rendering */
+function push(cmdText, html, opts={}){
+  const b = document.createElement("div");
+  b.className = "block";
+  b.innerHTML = (cmdText ? `<p class="cmdline"><b>almer@blog</b>:<span>${esc(cwd)}</span>$ <em>${esc(cmdText)}</em></p>` : "") + html;
+  out.appendChild(b);
+  bindRows(b);
+  if(!opts.noscroll) b.scrollIntoView({behavior: reduced ? "auto":"smooth", block:"start"});
+  return b;
+}
+
+function bindRows(scope){
+  scope.querySelectorAll("[data-run]").forEach(el=>{
+    el.addEventListener("click", ()=> typeAndRun(el.dataset.run));
+  });
+  scope.querySelectorAll("[data-goto]").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const t = document.getElementById(el.dataset.goto);
+      if(t) t.scrollIntoView({behavior: reduced ? "auto" : "smooth", block:"start"});
+    });
+  });
+}
+
+function seriesItem(s){
+  return {kind:s.kind, title:s.title, date:s.date, meta:`${s.levels.length} levels`,
+          excerpt:s.excerpt, run:`ls ${s.slug}`};
+}
+function projectItem(p){
+  return {kind:"project", title:p.title, date:p.date, meta:p.read,
+          excerpt:p.excerpt, run:`cat ${p.slug}`};
+}
+function rowsHTML(items, hint){
+  if(!items.length) return `<p class="err">Nothing here yet.</p>`;
+  return `<div class="rows">` + items.map(c=>`
+    <button class="row" data-run="${c.run}">
+      <span class="d">${fmt(c.date)}</span>
+      <span class="k ${c.kind}">${c.kind}</span>
+      <span class="n">${esc(c.title)}</span>
+      <span class="r">${esc(c.meta)}</span>
+      <span class="x">${esc(c.excerpt)}</span>
+    </button>`).join("") + `</div>
+    <p class="note">${hint}</p>`;
+}
+function catRows(){
+  return rowsHTML(SERIES.map(seriesItem).concat(PROJECTS.map(projectItem)),
+    "Click a line to open it.");
+}
+function seriesRows(){
+  return rowsHTML(SERIES.map(seriesItem), "Click one to see its levels.");
+}
+function projectRows(){
+  return rowsHTML(PROJECTS.map(projectItem),
+    "Click a project to read it — same as typing <b>cat &lt;name&gt;</b>.");
+}
+
+function levelRows(s){
+  return `<div class="lgrid">` + s.levels.map(l=>`
+    <button class="lcell" data-run="cat ${l.id}">${esc(l.label)}</button>`).join("") + `</div>
+    <p class="note">Click a level to read it — same as typing <b>cat &lt;level&gt;</b>, e.g. <b>cat 5-6</b>.</p>`;
+}
+
+/* --------------------------------------------------------------- outputs */
+const VIEWS = {
+  welcome(){
+    return `<pre class="banner">  ____ _    _  _ ____ ____  ____ ____ ____ _ _  _ ____ ____ _  _
+  |__| |    |\\/| |___ |__/  | __ |__| |__/ | |\\ | | __ |__| |\\ |
+  |  | |___ |  | |___ |  \\  |__] |  | |  \\ | | \\| |__] |  | | \\|  blog</pre>
+    <p class="lede">Hi — this is a blog dressed up as a terminal. <b>You don't need to know any commands.</b> Every button below the screen does the typing for you.</p>
+    <p class="lede" style="color:var(--dim)">If you'd rather type: the commands are all plain words like <b>help</b>, <b>ls</b>, and <b>cat</b>. Press Enter to run one.</p>
+    <table class="tbl"><tbody>
+      <tr><td><button class="cmdchip" data-run="ls writeups">ls writeups</button></td><td class="desc">Start here — the long write-ups</td></tr>
+      <tr><td><button class="cmdchip" data-run="cat about.md">cat about.md</button></td><td class="desc">Who's writing all this</td></tr>
+      <tr><td><button class="cmdchip" data-run="help">help</button></td><td class="desc">Everything you can do</td></tr>
+    </tbody></table>`;
+  },
+
+  help(){
+    return `<p class="note">A command is just a word you run. Click one, or type it and press Enter.</p>
+    <table class="tbl"><tbody>` +
+    COMMANDS.filter(c=>!c.cmd.startsWith("cat ")||c.cmd==="cat about.md").map(c=>
+      `<tr><td><button class="cmdchip" data-run="${esc(c.cmd)}">${esc(c.cmd)}</button></td><td class="desc">${esc(c.label)}</td></tr>`
+    ).join("") +
+    `<tr><td><button class="cmdchip" data-run="ls">cat &lt;name&gt;</button></td><td class="desc">Open one post by name — e.g. <b>cat btl1</b></td></tr>
+    </tbody></table>
+    <p class="note">Shortcuts, if you want them: <b>↑</b> and <b>↓</b> scroll through what you've already run, <b>Tab</b> finishes a half-typed command.</p>`;
+  },
+
+  ls(){
+    return `<p class="note">Categories in ~ — click one to go in.</p>` + catRows();
+  },
+
+  series(slug){
+    const s = SERIES.find(x=>x.slug===slug);
+    if(!s) return null;
+    return `<p class="note">${esc(s.title)} — ${s.levels.length} levels, in order.</p>` + levelRows(s);
+  },
+
+  projects(){
+    if(!PROJECTS.length) return `<p class="note">No projects written up yet — that folder's still empty.</p>
+      <p class="note">In the meantime: <button class="cmdchip" data-run="ls bandit">ls bandit</button></p>`;
+    return `<p class="note">Projects — ${PROJECTS.length} ${PROJECTS.length===1?"entry":"entries"}.</p>` + projectRows();
+  },
+
+  level(id){
+    const s = SERIES.find(x=>x.levels.some(l=>l.id===id));
+    if(!s) return null;
+    const i = s.levels.findIndex(l=>l.id===id), l = s.levels[i];
+    const prev = s.levels[i-1], next = s.levels[i+1];
+    return `<div class="doc">
+      <h3 style="margin-top:0">${esc(l.label)}</h3>
+      <div class="meta"><span>${esc(s.title)}</span><span>level ${i+1} of ${s.levels.length}</span></div>
+      ${l.body}
+    </div>
+    <div class="pn">
+      ${prev?`<button class="cmdchip" data-run="cat ${prev.id}">← ${esc(prev.label)}</button>`:""}
+      ${next?`<button class="cmdchip" data-run="cat ${next.id}">${esc(next.label)} →</button>`:""}
+      <button class="cmdchip" data-run="ls ${s.slug}">all levels</button>
+    </div>`;
+  },
+
+  certs(){
+    return `<p class="note">Certifications I hold, am working on, or have queued up.</p>
+    <table class="tbl"><tbody>` + CERTS.map(c=>`
+      <tr>
+        <td><span class="st ${c.cls}">${esc(c.status)}</span></td>
+        <td>
+          <div style="color:var(--text)">${esc(c.name)}</div>
+          <div class="desc" style="font-size:13px">${esc(c.org)} · ${esc(c.date)} — ${esc(c.note)}</div>
+          ${c.slug?`<button class="cmdchip" style="margin-top:8px" data-run="cat ${c.slug}">read my review</button>`:""}
+        </td>
+      </tr>`).join("") + `</tbody></table>`;
+  },
+
+  about(){
+    return `<div class="doc">
+      <h3>Almer Garingan</h3>
+      <p>Management Information Systems student at San José State University, based in the San Francisco Bay Area. I'm working toward SOC operations, cloud security, and defensive security engineering - and I learn by building things, breaking them, and writing down what happened.</p>
+
+      <h3>Education</h3>
+      <p><b>San José State University</b> — BS, Management Information Systems, 2024-2028. Minor in Computer Networking Systems Management. GPA 3.78.</p>
+      <ul>
+        <li>Treasurer, Cyber Intelligence &amp; Security Club (CIS)</li>
+        <li>Network Engineering Technology Society (NETS)</li>
+      </ul>
+
+      <h3>Experience</h3>
+      <div class="job">
+        <div class="job-h"><b>Treasurer</b> · SJSU Cyber Intelligence and Security Club</div>
+        <div class="job-d">Feb 2026 — present · San Jose, CA</div>
+        <p>Manage club finances for 300+ members, secured over $3,000 in funding for inventory and equipment, and help run workshops and CTF events.</p>
+      </div>
+      <div class="job">
+        <div class="job-h"><b>Linux Administrator</b> · National Collegiate Cyber Defense Competition</div>
+        <div class="job-d">Feb 2026</div>
+        <p>Maintained Linux firewall rules across 20+ live attack scenarios, hardened SSH configurations, tightened user accounts and permissions, and built a Wazuh dashboard for the SOC environment.</p>
+      </div>
+      <div class="job">
+        <div class="job-h"><b>Cyber Security Extern</b> · Hydroficient, via Extern</div>
+        <div class="job-d">Jan 2026 — Jul 2026 · Remote</div>
+        <p>Built and secured an MQTT-based IoT pipeline using Python, TLS encryption and device certificates for real-time water monitoring. Ran replay attack simulations and TLS benchmarking, and built a live security dashboard in Streamlit.</p>
+      </div>
+      <div class="job">
+        <div class="job-h"><b>AYS</b> · Macy's</div>
+        <div class="job-d">Dec 2025 — present · Hayward, CA</div>
+        <p>Part-time on the floor, handling 150-250 customers a shift and 300-400 transactions a week.</p>
+      </div>
+      <div class="job">
+        <div class="job-h"><b>College of Business Representative, Academic Core</b> · Akbayan Pilipinx American Organization at SJSU</div>
+        <div class="job-d">Aug 2025 — Jul 2026 · San Jose, CA</div>
+        <p>Represented the College of Business on the Academic Core, advocating for student academic concerns. Organized forums and workshops with peers, coordinated with faculty on academic policy feedback, and helped build study guides and career resources.</p>
+      </div>
+      <div class="job">
+        <div class="job-h"><b>AI and Automation Extern</b> · Outamation, via Extern</div>
+        <div class="job-d">Jul 2025 — Oct 2025 · Remote</div>
+        <p>Built document pipelines over 200+ page mortgage files using OCR (Tesseract, PaddleOCR), PyMuPDF parsing, and RAG with LlamaIndex, benchmarking open models like Mistral and Phi-2.</p>
+      </div>
+      <div class="job">
+        <div class="job-h"><b>Volunteer</b> · Hayward Promise Neighborhoods</div>
+        <div class="job-d">Jul 2025 · Hayward, CA</div>
+        <p>Distributed food to individuals and families, serving over 30 community members and picking up extra responsibilities when the team was short-handed.</p>
+      </div>
+
+      <h3>Projects</h3>
+      <ul>
+        <li><b>DigitalOcean honeypot</b> - a T-Pot instance exposed to the internet, logging SSH and brute-force traffic across 10+ honeypot services, analyzed in Elastic and Kibana with Suricata IDS for reconnaissance alerts</li>
+        <li><b>Pi-hole</b> - network-wide DNS filtering across every device at home, blocking over 96% of adware in testing</li>
+        <li><b>OverTheWire: Bandit</b> - all 26 levels, written up one at a time</li>
+      </ul>
+
+      <h3>Tools I've worked with</h3>
+      <p>Linux, Kali, Proxmox, Elastic Stack, Kibana, Wazuh, Suricata, SSH, firewalls, DigitalOcean, Python, DNS, DHCP and IP addressing.</p>
+
+      <h3>What I'm after</h3>
+      <p>Cybersecurity and IT internships. Open to on-site around Hayward, hybrid, or remote. If you're hiring or just want to talk shop, run <b>contact</b>.</p>
+    </div>`;
+  },
+
+  contact(){
+    return `<table class="tbl"><tbody>
+      <tr><td class="desc">Email</td><td><a href="mailto:garinganalmer@gmail.com">garinganalmer@gmail.com</a></td></tr>
+      <tr><td class="desc">LinkedIn</td><td><a href="https://www.linkedin.com/in/almergaringan/" target="_blank" rel="noopener">in/almergaringan</a></td></tr>
+      <tr><td class="desc">GitHub</td><td><a href="https://github.com/AlmerGaringan" target="_blank" rel="noopener">github.com/AlmerGaringan</a></td></tr>
+      <tr><td class="desc">Based</td><td>San Francisco Bay Area</td></tr>
+      <tr><td class="desc">Status</td><td class="ok">Open to cybersecurity and IT internships</td></tr>
+    </tbody></table>`;
+  },
+
+  whoami(){
+    return `<p class="ok">almer — MIS student at SJSU, treasurer of the Cyber Intelligence &amp; Security Club, open to security internships.</p>`;
+  },
+
+  post(slug){
+    const p = PROJECTS.find(x=>x.slug===slug);
+    if(!p) return null;
+    return `<div class="doc${p.wide?" wide":""}">
+      <h3 style="margin-top:0">${esc(p.title)}</h3>
+      <div class="meta"><span>${fmt(p.date)}</span><span>${p.read} read</span><span>${p.tags.join(" · ")}</span></div>
+      ${p.body}
+    </div>
+    <p class="note">Back to the list: <button class="cmdchip" data-run="ls">ls</button></p>`;
+  }
+};
+
+/* ---------------------------------------------------------------- parser */
+function run(raw){
+  const line = raw.trim();
+  if(!line) return;
+  history.push(line); hIndex = history.length;
+  const [verb, ...rest] = line.split(/\s+/);
+  const arg = rest.join(" ").toLowerCase();
+  const v = verb.toLowerCase();
+
+  if(v==="clear"){ out.innerHTML=""; setPath("~");
+    push("clear", `<p class="note">Screen cleared.</p>
+      <table class="tbl"><tbody>
+        <tr><td><button class="cmdchip" data-run="home">home</button></td><td class="desc">Back to the start</td></tr>
+        <tr><td><button class="cmdchip" data-run="ls">ls</button></td><td class="desc">See everything</td></tr>
+        <tr><td><button class="cmdchip" data-run="help">help</button></td><td class="desc">Every command</td></tr>
+      </tbody></table>`, {noscroll:true}); return; }
+  if(v==="help"||v==="?"||v==="man"){ setPath("~"); push(line, VIEWS.help()); return; }
+  if(v==="whoami"){ push(line, VIEWS.whoami()); return; }
+  if(v==="contact"||v==="email"){ setPath("~/contact"); push(line, VIEWS.contact()); return; }
+  if(v==="pwd"){ push(line, `<p class="ok">${esc(cwd)}</p>`); return; }
+
+  if(v==="home"||v==="~"||(v==="cd" && (!arg||arg==="~"||arg==="..")))
+    { setPath("~"); push(line, VIEWS.welcome()); return; }
+
+  if(v==="ls"||v==="dir"||v==="cd"){
+    if(!arg||arg==="~"||arg===".."){ setPath("~"); push(line, VIEWS.ls()); return; }
+    if(arg.startsWith("cert")){ setPath("~/certs"); push(line, VIEWS.certs()); return; }
+    if(arg.startsWith("project")){ setPath("~/projects"); push(line, VIEWS.projects()); return; }
+    if(arg.startsWith("writeup")){ setPath("~/writeups"); push(line, `<p class="note">Write-up series — ${SERIES.length}.</p>` + seriesRows()); return; }
+    const s = SERIES.find(x=>x.slug===arg||arg.includes(x.slug));
+    if(s){ setPath("~/"+s.slug); push(line, VIEWS.series(s.slug)); return; }
+    push(line, `<p class="err">No folder called "${esc(arg)}".</p><p class="note">Try <button class="cmdchip" data-run="ls">ls</button> to see the categories.</p>`);
+    return;
+  }
+
+  if(v==="cat"||v==="open"||v==="read"||v==="less"){
+    const key = arg.replace(/\.md$/,"").replace(/^bandit[\s-]*/,"");
+    if(arg.replace(/\.md$/,"")==="about"||arg==="aboutme"){ setPath("~/about.md"); push(line, VIEWS.about()); return; }
+    const doc = VIEWS.level(key);
+    if(doc){ setPath("~/bandit/"+key); push(line, doc); return; }
+    const s = SERIES.find(x=>x.slug===key);
+    if(s){ setPath("~/"+s.slug); push(line, VIEWS.series(s.slug)); return; }
+    const pr = VIEWS.post(key);
+    if(pr){ setPath("~/"+key); push(line, pr); return; }
+    const guess = BANDIT.find(l=>l.id.startsWith(key)||l.label.toLowerCase().includes(key));
+    push(line, `<p class="err">There's no file called "${esc(arg)}".</p>` +
+      (guess ? `<p class="note">Did you mean <button class="cmdchip" data-run="cat ${guess.id}">cat ${guess.id}</button>?</p>`
+             : `<p class="note">Run <button class="cmdchip" data-run="ls">ls</button> to see what's available.</p>`));
+    return;
+  }
+
+  if(v==="sudo"){ push(line, `<p class="err">almer is not in the sudoers file. This incident has been logged.</p><p class="note">Kidding — nothing was logged. Try <b>help</b>.</p>`); return; }
+  if(v==="exit"||v==="quit"){ push(line, `<p class="note">There's no exit — it's a website.</p><p class="note">Run <button class="cmdchip" data-run="home">home</button> to start over.</p>`); return; }
+
+  const near = COMMANDS.find(c=>c.cmd.startsWith(v)||v.startsWith(c.cmd.split(" ")[0]));
+  push(line, `<p class="err">"${esc(verb)}" isn't a command here.</p>` +
+    (near ? `<p class="note">Closest match: <button class="cmdchip" data-run="${esc(near.cmd)}">${esc(near.cmd)}</button> — ${esc(near.label)}</p>`
+          : `<p class="note">No harm done. Click <button class="cmdchip" data-run="help">help</button> for the full list.</p>`));
+}
+
+/* ------------------------------------------------- click → type → run */
+let busy = false;
+function typeAndRun(text){
+  if(busy) return;
+  closeAC();
+  if(reduced){ input.value=""; run(text); return; }
+  busy = true;
+  input.value = "";
+  let i = 0;
+  const tick = setInterval(()=>{
+    input.value = text.slice(0, ++i);
+    if(i >= text.length){
+      clearInterval(tick);
+      setTimeout(()=>{ input.value=""; busy=false; run(text); }, 190);
+    }
+  }, 28);
+}
+
+/* ------------------------------------------------------------ autocomplete */
+let sel = -1;
+function openAC(q){
+  const matches = COMMANDS.filter(c=>c.cmd.toLowerCase().startsWith(q.toLowerCase())).slice(0,6);
+  if(!q || !matches.length){ closeAC(); return; }
+  sel = -1;
+  ac.innerHTML = matches.map(m=>`<button data-cmd="${esc(m.cmd)}"><b>${esc(m.cmd)}</b><span>${esc(m.label)}</span></button>`).join("");
+  ac.querySelectorAll("button").forEach(b=>b.addEventListener("mousedown", e=>{ e.preventDefault(); typeAndRun(b.dataset.cmd); }));
+}
+function closeAC(){ ac.innerHTML=""; sel=-1; }
+function acItems(){ return [...ac.querySelectorAll("button")]; }
+
+/* --------------------------------------------------------------- history */
+const history = []; let hIndex = 0;
+
+input.addEventListener("input", ()=> openAC(input.value));
+input.addEventListener("blur", ()=> setTimeout(closeAC,120));
+input.addEventListener("keydown", e=>{
+  const items = acItems();
+  if(e.key==="Enter"){
+    e.preventDefault();
+    if(sel>-1 && items[sel]){ typeAndRun(items[sel].dataset.cmd); return; }
+    const val = input.value; input.value=""; closeAC(); run(val); return;
+  }
+  if(e.key==="Tab" && items.length){ e.preventDefault(); input.value = items[Math.max(sel,0)].dataset.cmd; closeAC(); return; }
+  if(e.key==="Escape"){ closeAC(); return; }
+  if(e.key==="ArrowDown"){
+    if(items.length){ e.preventDefault(); sel=(sel+1)%items.length; items.forEach((b,i)=>b.classList.toggle("sel",i===sel)); return; }
+    if(hIndex < history.length-1){ e.preventDefault(); input.value = history[++hIndex]; }
+    else { hIndex = history.length; input.value=""; }
+    return;
+  }
+  if(e.key==="ArrowUp"){
+    if(items.length){ e.preventDefault(); sel=(sel-1+items.length)%items.length; items.forEach((b,i)=>b.classList.toggle("sel",i===sel)); return; }
+    if(hIndex>0){ e.preventDefault(); input.value = history[--hIndex]; }
+    return;
+  }
+});
+
+/* ------------------------------------------------------------------ boot */
+document.getElementById("rail").innerHTML = COMMANDS.filter(c=>c.pill)
+  .map(c=>`<button class="pill" data-run="${esc(c.cmd)}"><b>${esc(c.cmd)}</b><span>${esc(c.label)}</span></button>`).join("");
+bindRows(document.getElementById("rail"));
+document.getElementById("helpbtn").addEventListener("click", ()=> typeAndRun("help"));
+document.getElementById("tpath").addEventListener("click", ()=> typeAndRun("home"));
+
+document.addEventListener("click", e=>{
+  if(coarse) return;
+  if(e.target.closest("button, a, input")) return;
+  input.focus();
+});
+
+push("", VIEWS.welcome(), {noscroll:true});
+if(!coarse) input.focus();
+</script>
+</body>
+</html>
