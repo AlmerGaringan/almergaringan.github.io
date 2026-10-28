@@ -1834,7 +1834,7 @@ const PAL = {
   D:"#3a3a3a", L:"#c6c6c6", R:"#e04848", K:"#101410", g:"#5cdb5c", ".":null,
   b:"#5a3a1c", B:"#7a5230", w:"#d8eef5", y:"#f0a81c", Y:"#ffd86a", o:"#c47a10",
   S:"#1a2a44", s:"#3a6ac8", c:"#9a6a3a", G:"#e8c440", r:"#c03030", W:"#ffffff", X:"#ff6060",
-  n:"#2a2a2a", m:"#7a7a7a", p:"#b0b0b0"
+  n:"#2a2a2a", m:"#7a7a7a", p:"#b0b0b0", U:"#1f6fc4", u:"#0d3f78", Q:"#f2c531"
 };
 const GRIDS = {
   terminal:["DDDDDDDDDDDD","DLLLLLLLLRLD","DKKKKKKKKKKD","DKgKKKKKKKKD","DKKgKKKKKKKD","DKKKgKKKKKKD",
@@ -1863,6 +1863,8 @@ const GRIDS = {
             "WWW......WWW","WWWW....WWWW","..WWW..WWW..",".WWWWWWWWWW.","..W.WWWW.W..","....WWWW...."],
   sign:    ["............",".bbbbbbbbbb.",".bBBBBBBBBb.",".bBWWBWWWBb.",".bBBBBBBBBb.",".bBWWWBWWBb.",
             ".bBBBBBBBBb.",".bbbbbbbbbb.",".....bb.....",".....bb.....","...ggggg....","..gggggggg.."],
+  gradcap: ["............",".....UU.....","...UUUUUU...",".UUUUUQUUUU.","UUUUUUUQUUUU",".UUUUUUUQUU.",
+            "...uuuuuuQ..","...uuuuuuQ..","...uuuuuuQQ.","....uuuu.QQ.","............","............"],
   github:  ["...WWWWWW...",".WWWWWWWWWW.",".WW.WWWW.WW.","WWW......WWW","WW........WW","WW........WW",
             "WW........WW","WWW......WWW",".WWW....WWW.",".W.WW..WWWW.","..WWW..WWW..","...WW..WW..."],
   linkedin:[".WWWWWWWWWW.","WWWWWWWWWWWW","WW.WWWWWWWWW","WWWWWWWWWWWW","WW.W....WWWW","WW.W.WW.WWWW",
@@ -2577,7 +2579,7 @@ function aboutScreen(){
       <aside class="about-l">
         <div class="photo"><img src="${PHOTO_DATA}" alt="Almer Garingan"><span class="mono" aria-hidden="true">AG</span></div>
         <div class="plate">Almer Garingan</div>
-        <div class="divider" aria-hidden="true"><span></span>${icon("shield")}<span></span></div>
+        <div class="divider" aria-hidden="true"><span></span>${icon("gradcap")}<span></span></div>
         <dl class="facts">${ABOUT.facts.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
         <div class="chips">${ABOUT.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join("")}</div>
         <div class="about-btns">
