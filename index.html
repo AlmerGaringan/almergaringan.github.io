@@ -131,6 +131,11 @@ body.inner .tools .ver{display:none}
 /* about */
 .about{display:grid;grid-template-columns:330px minmax(0,1fr);gap:22px;max-width:1080px;margin:0 auto;padding:6px 0}
 .about-l{display:flex;flex-direction:column;gap:10px}
+.stats{flex:1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:2px;min-height:0}
+.stat{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 2px;background:#5b5240;border:2px solid #000;
+  box-shadow:inset 2px 2px 0 rgba(255,255,255,.15), inset -2px -2px 0 rgba(0,0,0,.35)}
+.stat-v{font-size:22px;line-height:1;color:var(--yellow);text-shadow:2px 2px 0 #3F3F00}
+.stat-l{font-size:12px;line-height:1.1;color:#E6DECB;text-align:center}
 .photo{position:relative;aspect-ratio:1;background:#3a3328;border:4px solid #fff;box-shadow:0 0 0 2px #000, inset 0 0 0 2px #000;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
 .photo .mono{font-family:var(--logo);font-size:64px;color:#8a7d64;text-shadow:4px 4px 0 #1d1912}
@@ -2578,6 +2583,12 @@ function aboutScreen(){
           ${RESUME?`<a class="btn" href="${RESUME}" target="_blank" rel="noopener" data-resume aria-label="Resume (opens the PDF in a new tab)"><span class="lbl">Resume</span></a>`:`<a class="btn" href="${LINKS.linkedin}" target="_blank" rel="noopener"><span class="lbl">LinkedIn</span></a>`}
           <button class="btn" data-book><span class="lbl">Contact</span></button>
           <a class="btn wide" href="${LINKS.tryhackme}" target="_blank" rel="noopener" aria-label="TryHackMe profile (opens in a new tab)"><span class="lbl">TryHackMe Profile</span></a>
+        </div>
+        <div class="stats" aria-label="Quick stats">
+          <div class="stat"><span class="stat-v">3.78</span><span class="stat-l">GPA</span></div>
+          <div class="stat"><span class="stat-v">2028</span><span class="stat-l">Graduating</span></div>
+          <div class="stat"><span class="stat-v">${PROJECTS.length}</span><span class="stat-l">Projects</span></div>
+          <div class="stat"><span class="stat-v">${SERIES.reduce((n,s)=>n+s.levels.length,0)}</span><span class="stat-l">Bandit<br>levels</span></div>
         </div>
       </aside>
       <section class="about-r">
