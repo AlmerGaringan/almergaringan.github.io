@@ -149,6 +149,8 @@ body.inner .tools .ver{display:none}
 .pts a{color:var(--aqua);font-family:var(--px)}
 .about-btns .btn{height:46px;font-size:20px}
 .about-r{display:flex;flex-direction:column;gap:14px;min-width:0}
+.bio p{margin:0 0 12px}
+.bio p:last-child{margin:0}
 .bio{margin:0;padding:16px 20px;font-size:19px;line-height:1.6;color:#fff;text-shadow:2px 2px 0 #1c1c1c;background:#5b5240;border:2px solid #000;box-shadow:inset 2px 2px 0 rgba(255,255,255,.15), inset -2px -2px 0 rgba(0,0,0,.35)}
 .now-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:4px}
 .now-h h2{margin:0;font-family:var(--px);font-weight:400;font-size:30px;text-shadow:2px 2px 0 #1c1c1c}
@@ -1732,7 +1734,8 @@ const SONG = { title:"", artist:"", spotify:"" };
 const PLAYLIST = "https://open.spotify.com/playlist/3S5CgDexBF6WA9nrlszLQr";
 
 const ABOUT = {
-  bio: "Hi, I'm Almer! I'm a Management Information Systems student at San José State University, minoring in Computer Networking System Management, and I'm really interested in cybersecurity and networking. I love learning and being challenged, and I learn best by messing things up and figuring out how to fix them, whether that's a new lab, a wargame level that won't crack, or a project that breaks in ways I didn't expect.",
+  /* Bio paragraphs: separate them with a blank line (\n\n). */
+  bio: "Hi, I'm Almer! I'm a Management Information Systems student at San José State University, minoring in Computer Networking System Management, and I'm really interested in cybersecurity and networking. I love learning and being challenged, and I learn best by messing things up and figuring out how to fix them.\n\nI'm President of the Cyber Intelligence & Security Club, and I've built my defensive security skills as a Cyber Security Extern at Hydroficient and as a Linux Administrator in the Collegiate Cyber Defense Competition. Outside of that, I build my own projects, like a cloud honeypot that captured 50,000+ live attacks.\n\nI'm looking for cybersecurity and IT internships as I work toward SOC operations, cloud security, and defensive security engineering.",
   facts: [["Studying","MIS + CNSM"],["Based in","SF Bay Area"],["Currently","Student @ SJSU"]],
   tags: ["Cybersecurity","Networking","Open to internships"],
   /* "Right now" slots. icon: book, shield, disc, cup, sushi, honey, case, terminal, server, medal
@@ -2578,7 +2581,7 @@ function aboutScreen(){
         </div>
       </aside>
       <section class="about-r">
-        <p class="bio">${esc(ABOUT.bio)}</p>
+        <div class="bio">${ABOUT.bio.split(/\n\s*\n/).map(p=>`<p>${esc(p)}</p>`).join("")}</div>
         <div class="now-h"><h2>Right now</h2><span>click a slot to open it</span></div>
         <div class="slots">${now}</div>
       </section>
