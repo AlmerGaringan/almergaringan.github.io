@@ -145,6 +145,8 @@ body.inner .tools .ver{display:none}
 .facts dd{margin:0;color:#fff;font-size:17px;text-align:right}
 .about-l .chips{margin-top:2px}
 .about-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.about-btns .wide{grid-column:1 / -1}
+.pts a{color:var(--aqua);font-family:var(--px)}
 .about-btns .btn{height:46px;font-size:20px}
 .about-r{display:flex;flex-direction:column;gap:14px;min-width:0}
 .bio{margin:0;padding:16px 20px;font-size:19px;line-height:1.6;color:#fff;text-shadow:2px 2px 0 #1c1c1c;background:#5b5240;border:2px solid #000;box-shadow:inset 2px 2px 0 rgba(255,255,255,.15), inset -2px -2px 0 rgba(0,0,0,.35)}
@@ -1772,7 +1774,8 @@ const SKILLS = [
 const LINKS = {
   email:"garinganalmer@gmail.com",
   linkedin:"https://www.linkedin.com/in/almergaringan/",
-  github:"https://github.com/AlmerGaringan"
+  github:"https://github.com/AlmerGaringan",
+  tryhackme:"https://tryhackme.com/p/almer.garingan"
 };
 /* Contact form delivery. Get a free access key at web3forms.com (enter your email and the
    key is emailed to you), then paste it here. With a key, "Sign & Send" emails you directly.
@@ -2467,6 +2470,10 @@ function skillsScreen(){
   const certs = CERTS.map(c=>`<li><span class="${c.cls==="held"?"ok":"wip"}">${c.cls==="held"?"Earned":"In progress"}</span> ${esc(c.name)} <span class="sub">· ${esc(c.org)} · ${esc(c.date)}</span></li>`).join("");
   const body = `<div class="timeline">${groups}
       <section class="sk"><h2 class="sk-h">Certifications</h2><ul class="pts">${certs}</ul></section>
+      <section class="sk"><h2 class="sk-h">Hands-on Practice</h2><ul class="pts">
+        <li>TryHackMe: SOC Simulator and labs <span class="sub">·</span> <a href="${LINKS.tryhackme}" target="_blank" rel="noopener">View my profile &gt;</a></li>
+        <li>OverTheWire: Bandit <span class="sub">·</span> <a href="#/w/bandit">Read my writeups &gt;</a></li>
+      </ul></section>
     </div>`;
   return {title:"Skills | Almer Garingan", html:screen("Skills", "", body, doneBtn(), {wide:true})};
 }
@@ -2514,6 +2521,7 @@ function aboutScreen(){
         <div class="about-btns">
           ${RESUME?`<a class="btn" href="${RESUME}" target="_blank" rel="noopener" data-resume aria-label="Resume (opens the PDF in a new tab)"><span class="lbl">Resume</span></a>`:`<a class="btn" href="${LINKS.linkedin}" target="_blank" rel="noopener"><span class="lbl">LinkedIn</span></a>`}
           <button class="btn" data-book><span class="lbl">Contact</span></button>
+          <a class="btn wide" href="${LINKS.tryhackme}" target="_blank" rel="noopener" aria-label="TryHackMe profile (opens in a new tab)"><span class="lbl">TryHackMe Profile</span></a>
         </div>
       </aside>
       <section class="about-r">
@@ -2758,6 +2766,7 @@ const CMDS = [
   {c:"/blog", d:"Open the Blog"},
   {c:"/contact", d:"Open Contact Me"},
   {c:"/whoami", d:"The one-line version"},
+  {c:"/thm", d:"Open my TryHackMe profile"},
   {c:"/settings", d:"Open settings (volume, songs, motion)"},
   {c:"/time set night", d:"Switch the sky to night"},
   {c:"/time set day", d:"Switch the sky to day"},
@@ -2805,6 +2814,7 @@ function runCmd(raw){
     case "blog": go("#/blog"); return;
     case "contact": case "email": go("#/contact"); return;
     case "clear": log.innerHTML=""; return;
+    case "thm": case "tryhackme": window.open(LINKS.tryhackme,"_blank","noopener"); return;
     case "whoami": say(`<span class="a">almer</span> — MIS student at SJSU, president of the Cyber Intelligence &amp; Security Club, open to security internships.`); return;
     case "sudo": say(`<span class="r">almer is not in the sudoers file. This incident will be reported.</span> <span class="g">(It won't.)</span>`); return;
     case "time":
