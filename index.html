@@ -1799,7 +1799,8 @@ const LINKS = {
   email:"garinganalmer@gmail.com",
   linkedin:"https://www.linkedin.com/in/almergaringan/",
   github:"https://github.com/AlmerGaringan",
-  tryhackme:"https://tryhackme.com/p/almer.garingan"
+  tryhackme:"https://tryhackme.com/p/almer.garingan",
+  discord:"https://discord.com/users/1069090828221427723"
 };
 /* Contact form delivery. Get a free access key at web3forms.com (enter your email and the
    key is emailed to you), then paste it here. With a key, "Sign & Send" emails you directly.
@@ -2582,7 +2583,8 @@ function aboutScreen(){
         <div class="about-btns">
           ${RESUME?`<a class="btn" href="${RESUME}" target="_blank" rel="noopener" data-resume aria-label="Resume (opens the PDF in a new tab)"><span class="lbl">Resume</span></a>`:`<a class="btn" href="${LINKS.linkedin}" target="_blank" rel="noopener"><span class="lbl">LinkedIn</span></a>`}
           <button class="btn" data-book><span class="lbl">Contact</span></button>
-          <a class="btn wide" href="${LINKS.tryhackme}" target="_blank" rel="noopener" aria-label="TryHackMe profile (opens in a new tab)"><span class="lbl">TryHackMe Profile</span></a>
+          <a class="btn" href="${LINKS.tryhackme}" target="_blank" rel="noopener" aria-label="TryHackMe profile (opens in a new tab)"><span class="lbl">TryHackMe</span></a>
+          <a class="btn" href="${LINKS.discord}" target="_blank" rel="noopener" aria-label="Discord profile (opens in a new tab)"><span class="lbl">Discord</span></a>
         </div>
         <div class="stats" aria-label="Quick stats">
           <div class="stat"><span class="stat-v">3.8</span><span class="stat-l">GPA</span></div>
@@ -2836,6 +2838,7 @@ const CMDS = [
   {c:"/contact", d:"Open Contact Me"},
   {c:"/whoami", d:"The one-line version"},
   {c:"/thm", d:"Open my TryHackMe profile"},
+  {c:"/discord", d:"Open my Discord profile"},
   {c:"/settings", d:"Open settings (volume, songs, motion)"},
   {c:"/time set night", d:"Switch the sky to night"},
   {c:"/time set day", d:"Switch the sky to day"},
@@ -2883,6 +2886,7 @@ function runCmd(raw){
     case "blog": go("#/blog"); return;
     case "contact": case "email": go("#/contact"); return;
     case "clear": log.innerHTML=""; return;
+    case "discord": window.open(LINKS.discord,"_blank","noopener"); return;
     case "thm": case "tryhackme": window.open(LINKS.tryhackme,"_blank","noopener"); return;
     case "whoami": say(`<span class="a">almer</span> — MIS student at SJSU, president of the Cyber Intelligence &amp; Security Club, open to security internships.`); return;
     case "sudo": say(`<span class="r">almer is not in the sudoers file. This incident will be reported.</span> <span class="g">(It won't.)</span>`); return;
